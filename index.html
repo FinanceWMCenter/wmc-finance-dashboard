@@ -208,9 +208,9 @@ MONTHS.forEach((m,mi)=>{
   PT_LIST.forEach(pt=>{
     const p=PT_PROFILE[pt];
     const rev=p.base*1e6*Math.pow(1+p.growth,mi/12)*SEASON[mi]*(1+(fnv(pt+mi+'r')-.5)*p.vol);
-    const cogs=rev*p.cogs*(1+(fnv(pt+mi+'c')-.5)*.06);
-    const opex=rev*p.opex*(1+(fnv(pt+mi+'o')-.5)*.08);
-    const depre=rev*p.depre;
+    const cogs=Math.abs(rev*p.cogs*(1+(fnv(pt+mi+'c')-.5)*.06));
+    const opex=Math.abs(rev*p.opex*(1+(fnv(pt+mi+'o')-.5)*.08));
+    const depre=Math.abs(rev*p.depre);
     const ebitda=rev-cogs-opex;
     const ebit=ebitda-depre;
     const tax=ebit>0?ebit*.22:0;
@@ -382,14 +382,33 @@ function makeBar(id,labels,datasets,stacked=false){
               y:{stacked,ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}}}
   });
 }
-function makeLine(id,labels,datasets){
+function makeLine(id,labels,datasets,showZero=false){
   dc(id);
+  // Add zero reference line as a flat dataset if needed
+  const allDatasets = showZero
+    ? [...datasets, {
+        label:'',data:labels.map(()=>0),
+        borderColor:'#94A3B8',borderWidth:1.5,borderDash:[5,5],
+        pointRadius:0,fill:false,tension:0,
+        tooltip:{enabled:false},
+      }]
+    : datasets;
   charts[id]=new Chart(document.getElementById(id),{
-    type:'line',data:{labels,datasets},
+    type:'line',data:{labels,datasets:allDatasets},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:legOpts},
-      scales:{x:{ticks:tickOpts,grid:gridOpts,border:{display:false}},
-              y:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}}}
+      plugins:{
+        legend:{
+          labels:{
+            color:'#64748B',font:{size:10,family:'Inter'},boxWidth:10,padding:14,
+            filter: item => item.text !== '' // hide zero-line from legend
+          }
+        }
+      },
+      scales:{
+        x:{ticks:tickOpts,grid:gridOpts,border:{display:false}},
+        y:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}
+      }
+    }
   });
 }
 function makeBarH(id,labels,data,colors){
@@ -511,10 +530,10 @@ function renderOverview(){
 
   // MtM line
   makeLine('ch-mtm',MO,[
-    {label:'Revenue', data:mtmRev,  borderColor:C[0],backgroundColor:CA(C[0]),fill:true,tension:.35,pointRadius:3,borderWidth:2},
-    {label:'EBITDA',  data:mtmEbitda,borderColor:C[3],backgroundColor:CA(C[3]),fill:true,tension:.35,pointRadius:3,borderWidth:2},
-    {label:'Net Profit',data:mtmNet,borderColor:C[1],backgroundColor:CA(C[1]),fill:true,tension:.35,pointRadius:3,borderWidth:2},
-  ]);
+    {label:'Revenue',   data:mtmRev,    borderColor:C[0],backgroundColor:CA(C[0]),fill:true,tension:.35,pointRadius:4,pointBackgroundColor:C[0],borderWidth:2.5},
+    {label:'EBITDA',    data:mtmEbitda, borderColor:C[3],backgroundColor:CA(C[3]),fill:true,tension:.35,pointRadius:4,pointBackgroundColor:C[3],borderWidth:2.5},
+    {label:'Net Profit',data:mtmNet,    borderColor:C[1],backgroundColor:CA(C[1]),fill:true,tension:.35,pointRadius:4,pointBackgroundColor:C[1],borderWidth:2.5},
+  ], true);
 
   // Rev by PT horizontal bar
   const ptR=sumByPT('rev');
@@ -588,11 +607,10 @@ function renderPL(){
             const r=sumField('rev')||1;
             const pctR=(total/r*100).toFixed(1)+'%';
             const trC=row.hi?'r-total':row.total?'r-section':'';
-            const neg=row.neg;
             return`<tr class="${trC}">
               <td>${row.n}</td>
-              ${vals.map(v=>`<td class="${cl(neg?-Math.abs(v):v)}">${fmt(neg?-Math.abs(v):v)}</td>`).join('')}
-              <td class="${cl(neg?-Math.abs(total):total)}">${fmt(neg?-Math.abs(total):total)}</td>
+              ${vals.map(v=>`<td class="${cl(v)}">${fmt(Math.abs(v))}</td>`).join('')}
+              <td class="${cl(total)}">${fmt(Math.abs(total))}</td>
               <td style="color:var(--muted)">${pctR}</td>
             </tr>`;
           }).join('')}
@@ -602,10 +620,10 @@ function renderPL(){
     </div>`;
 
   makeLine('ch-pl-mtm',MO,[
-    {label:'Revenue',    data:mtmRev,   borderColor:C[0],backgroundColor:CA(C[0]),fill:false,tension:.35,pointRadius:3,borderWidth:2},
-    {label:'EBITDA',     data:mtmEbitda,borderColor:C[3],backgroundColor:CA(C[3]),fill:false,tension:.35,pointRadius:3,borderWidth:2},
-    {label:'Net Profit', data:mtmNet,   borderColor:C[1],backgroundColor:CA(C[1]),fill:false,tension:.35,pointRadius:3,borderWidth:2},
-  ]);
+    {label:'Revenue',    data:mtmRev,    borderColor:C[0],backgroundColor:CA(C[0]),fill:false,tension:.35,pointRadius:4,pointBackgroundColor:C[0],borderWidth:2.5},
+    {label:'EBITDA',     data:mtmEbitda, borderColor:C[3],backgroundColor:CA(C[3]),fill:false,tension:.35,pointRadius:4,pointBackgroundColor:C[3],borderWidth:2.5},
+    {label:'Net Profit', data:mtmNet,    borderColor:C[1],backgroundColor:CA(C[1]),fill:false,tension:.35,pointRadius:4,pointBackgroundColor:C[1],borderWidth:2.5},
+  ], true);
 }
 
 // ── BALANCE SHEET ─────────────────────────────────────────────
@@ -692,10 +710,10 @@ function renderCashflow(){
     </div>`;
 
   makeLine('ch-cf-mtm',MO,[
-    {label:'Operating', data:mtmCFO,borderColor:C[1],backgroundColor:CA(C[1]),fill:true,tension:.3,borderWidth:2,pointRadius:3},
-    {label:'Investing', data:mtmCFI,borderColor:C[7],backgroundColor:CA(C[7]),fill:true,tension:.3,borderWidth:2,pointRadius:3},
-    {label:'Financing', data:mtmCFF,borderColor:C[3],backgroundColor:CA(C[3]),fill:true,tension:.3,borderWidth:2,pointRadius:3},
-  ]);
+    {label:'Operating', data:mtmCFO,borderColor:C[1],backgroundColor:CA(C[1]),fill:true,tension:.3,borderWidth:2.5,pointRadius:4,pointBackgroundColor:C[1]},
+    {label:'Investing', data:mtmCFI,borderColor:C[7],backgroundColor:CA(C[7]),fill:true,tension:.3,borderWidth:2.5,pointRadius:4,pointBackgroundColor:C[7]},
+    {label:'Financing', data:mtmCFF,borderColor:C[3],backgroundColor:CA(C[3]),fill:true,tension:.3,borderWidth:2.5,pointRadius:4,pointBackgroundColor:C[3]},
+  ], true);
   makeBar('ch-cf-pt',PT_LIST,[
     {label:'Operating CF',data:ptCFO,backgroundColor:CA(C[1]),borderColor:C[1],borderWidth:2,borderRadius:4},
     {label:'Investing CF',data:ptCFI,backgroundColor:CA(C[7]),borderColor:C[7],borderWidth:2,borderRadius:4},
