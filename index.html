@@ -7,140 +7,234 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-:root {
-  --bg:#F7F8FC; --surface:#FFFFFF; --surface2:#F0F2F9; --border:#E4E7F2; --border2:#CDD3EA;
-  --blue:#2563EB; --blue-l:#EEF3FF; --blue-d:#1D4ED8;
-  --green:#059669; --green-l:#ECFDF5;
-  --red:#DC2626; --red-l:#FEF2F2;
-  --amber:#D97706; --amber-l:#FFFBEB;
-  --purple:#7C3AED; --purple-l:#F5F3FF;
-  --text:#0F172A; --text2:#334155; --muted:#64748B; --label:#94A3B8;
-  --mono:'JetBrains Mono',monospace; --sans:'Inter',system-ui,sans-serif;
-  --r:8px; --r-lg:12px;
-  --sh:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
-  --sh-md:0 4px 16px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.04);
+:root{
+  --bg:#F5F7FB;--surface:#FFF;--s2:#F0F3FA;--s3:#E8ECFA;
+  --border:#E2E8F0;--border2:#C7D2E8;
+  --blue:#2563EB;--blue-l:#EEF3FF;--blue-d:#1E40AF;
+  --green:#059669;--green-l:#ECFDF5;
+  --red:#DC2626;--red-l:#FEF2F2;
+  --amber:#D97706;--amber-l:#FFFBEB;
+  --purple:#7C3AED;--purple-l:#F5F3FF;
+  --cyan:#0891B2;--orange:#EA580C;
+  --text:#0F172A;--t2:#334155;--muted:#64748B;--label:#94A3B8;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',system-ui,sans-serif;
+  --r:8px;--r-lg:14px;--r-xl:18px;
+  --sh:0 1px 4px rgba(15,23,42,.07),0 1px 2px rgba(15,23,42,.04);
+  --sh-md:0 4px 20px rgba(15,23,42,.09),0 2px 8px rgba(15,23,42,.04);
+  --sh-lg:0 8px 32px rgba(15,23,42,.1),0 4px 12px rgba(15,23,42,.05);
+  --sidebar:220px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
-#sidebar{width:224px;min-width:224px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;top:0;left:0;z-index:100;box-shadow:var(--sh)}
-.logo{padding:22px 20px 18px;border-bottom:1px solid var(--border)}
+html{font-size:13px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:var(--sidebar);min-width:var(--sidebar);
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;height:100vh;top:0;left:0;z-index:200;
+  box-shadow:var(--sh);transition:transform .25s ease;
+}
+.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
 .logo-lockup{display:flex;align-items:center;gap:10px}
-.logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(37,99,235,.3)}
-.logo-name{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px;line-height:1.2}
-.logo-sub{font-size:10px;color:var(--muted);margin-top:1px;letter-spacing:.3px}
-nav{flex:1;padding:10px 0;overflow-y:auto}
-.nav-section{padding:16px 20px 6px;font-size:9px;font-weight:600;color:var(--label);letter-spacing:1.5px;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;color:var(--muted);border-left:2px solid transparent;transition:all .12s;font-size:13px;font-weight:400;text-decoration:none}
-.nav-item:hover{background:var(--surface2);color:var(--text2)}
-.nav-item.active{color:var(--blue);border-left-color:var(--blue);background:var(--blue-l);font-weight:500}
-.nav-icon{font-size:14px;width:16px;text-align:center;flex-shrink:0}
-.sidebar-footer{padding:14px 20px;border-top:1px solid var(--border)}
-.refresh-row{display:flex;align-items:center;margin-bottom:6px}
-.refresh-dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2s infinite;flex-shrink:0}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.refresh-text{font-size:11px;color:var(--muted);display:flex;align-items:center}
-#last-refresh{font-size:10px;color:var(--label);margin-bottom:10px}
-.btn-logout{width:100%;padding:7px;border:1px solid var(--border2);border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;background:var(--surface);font-family:var(--sans);transition:all .12s;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-logout:hover{background:var(--red-l);color:var(--red);border-color:var(--red)}
-#main{margin-left:224px;flex:1;display:flex;flex-direction:column;min-height:100vh}
-#topbar{position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:var(--sh);min-height:52px}
-#page-title{font-size:14px;font-weight:600;color:var(--text);margin-right:auto}
-.filter-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
-.filter-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+.logo-mark{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue) 0%,var(--blue-d) 100%);
+  color:#fff;font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(37,99,235,.35);
+}
+.logo-name{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px;line-height:1.25}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:.2px;margin-top:1px}
+nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-group{padding:14px 16px 4px;font-size:9px;font-weight:700;color:var(--label);letter-spacing:1.8px;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 16px;cursor:pointer;color:var(--muted);
+  border-left:2px solid transparent;font-size:12.5px;
+  transition:all .12s;text-decoration:none;border-radius:0;
+}
+.nav-item:hover{background:var(--s2);color:var(--t2)}
+.nav-item.active{color:var(--blue);border-left-color:var(--blue);background:var(--blue-l);font-weight:600}
+.nav-icon{font-size:13px;width:15px;text-align:center;flex-shrink:0;opacity:.75}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;font-size:9px;font-weight:600;padding:2px 6px;border-radius:10px;background:var(--blue-l);color:var(--blue)}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border)}
+.live-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.live-text{font-size:11px;color:var(--muted)}
+#last-refresh{font-size:10px;color:var(--label);margin-bottom:8px}
+.btn-logout{
+  width:100%;padding:7px 12px;border:1px solid var(--border2);
+  border-radius:var(--r);font-size:11.5px;font-weight:500;
+  color:var(--muted);cursor:pointer;background:transparent;
+  font-family:var(--sans);transition:all .12s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-logout:hover{background:var(--red-l);color:var(--red);border-color:rgba(220,38,38,.3)}
+
+/* ── TOPBAR ── */
+#main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{
+  position:sticky;top:0;z-index:100;background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:52px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:var(--sh);
+}
+#page-title{font-size:14px;font-weight:600;color:var(--text);margin-right:auto;letter-spacing:-.2px}
+.fp{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:5px 11px;transition:border-color .12s}
+.fp:focus-within{border-color:var(--blue)}
+.fl{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
 select{background:transparent;border:none;color:var(--text);padding:0 2px;font-size:12px;font-family:var(--sans);cursor:pointer;outline:none;font-weight:500}
-.toggle-rt{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .12s}
-.toggle-rt.active{background:var(--blue-l);border-color:var(--blue);color:var(--blue)}
-.rt-dot{width:7px;height:7px;border-radius:50%;background:var(--label);flex-shrink:0;transition:background .12s}
-.toggle-rt.active .rt-dot{background:var(--blue)}
-#content{padding:28px;flex:1}
-.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:12px;color:var(--muted)}
-.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite}
+.tog-rt{
+  display:flex;align-items:center;gap:6px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:20px;padding:5px 11px;cursor:pointer;
+  font-size:11.5px;font-weight:500;color:var(--muted);transition:all .12s;
+  white-space:nowrap;
+}
+.tog-rt.on{background:var(--blue-l);border-color:rgba(37,99,235,.3);color:var(--blue)}
+.tog-d{width:7px;height:7px;border-radius:50%;background:var(--label);transition:background .12s;flex-shrink:0}
+.tog-rt.on .tog-d{background:var(--blue)}
+
+/* ── CONTENT ── */
+#content{padding:24px;flex:1}
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;height:320px;gap:12px;color:var(--muted)}
+.spinner{width:22px;height:22px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .65s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.sec-label{font-size:10px;font-weight:600;color:var(--label);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh);cursor:pointer;transition:all .15s;position:relative;overflow:hidden;display:block;text-decoration:none}
-.kpi-card:hover{box-shadow:var(--sh-md);transform:translateY(-2px)}
-.kpi-card:hover .kpi-arr{opacity:1;transform:translateX(2px)}
-.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r-lg) var(--r-lg) 0 0}
-.c-blue::after{background:linear-gradient(90deg,var(--blue),#60A5FA)}
-.c-green::after{background:linear-gradient(90deg,var(--green),#34D399)}
-.c-red::after{background:linear-gradient(90deg,var(--red),#F87171)}
-.c-amber::after{background:linear-gradient(90deg,var(--amber),#FCD34D)}
-.c-purple::after{background:linear-gradient(90deg,var(--purple),#A78BFA)}
-.kpi-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.kpi-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
-.kpi-arr{font-size:14px;color:var(--label);opacity:0;transition:all .15s}
-.kpi-val{font-family:var(--mono);font-size:24px;font-weight:500;color:var(--text);letter-spacing:-.5px;line-height:1}
-.kpi-val.pos{color:var(--green)}.kpi-val.neg{color:var(--red)}
-.kpi-pct{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:8px}
-.kpi-pct.pos{background:var(--green-l);color:var(--green)}.kpi-pct.neg{background:var(--red-l);color:var(--red)}
-.kpi-sub{font-size:11px;color:var(--label);margin-top:6px}
-.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px;margin-bottom:28px}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh)}
-.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.chart-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px}
-.chart-sub{font-size:11px;color:var(--label)}
-.chart-wrap{position:relative}
-.tbl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:20px;box-shadow:var(--sh)}
-.tbl-bar{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.tbl-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px}
-.tbl-hint{font-size:11px;color:var(--label)}
-.tbl-scroll{overflow-x:auto;max-height:520px;overflow-y:auto}
-.dt{width:100%;border-collapse:collapse}
-.dt th{background:var(--surface2);color:var(--label);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:9px 16px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border);position:sticky;top:0}
-.dt th:first-child{text-align:left}
-.dt td{padding:8px 16px;text-align:right;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text2);white-space:nowrap}
-.dt td:first-child{text-align:left;font-family:var(--sans);font-size:12px;color:var(--text)}
-.dt tr:hover td{background:var(--surface2)}
-.dt tr.r-total td{font-weight:700;color:var(--text);background:var(--blue-l);border-top:1px solid var(--border2)}
-.dt tr.r-section td{background:var(--surface2);color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:6px 16px;font-family:var(--sans)}
-.p{color:var(--green)!important}.n{color:var(--red)!important}
-.exec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh);margin-bottom:20px}
-.exec-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.exec-ico{width:28px;height:28px;border-radius:8px;background:var(--blue-l);color:var(--blue);font-size:14px;display:flex;align-items:center;justify-content:center}
-.exec-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px}
-.exec-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
-.exec-item:last-child{border-bottom:none;padding-bottom:0}
-.exec-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);margin-top:5px;flex-shrink:0}
-.exec-text{font-size:13px;color:var(--text2);line-height:1.6}
-.exec-hi{font-weight:600;color:var(--text)}
-#login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#EEF3FF 0%,#F7F8FC 50%,#F0F3FF 100%);z-index:999;display:flex;align-items:center;justify-content:center}
-.login-wrap{width:400px}
-.login-eye{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
-.login-title{font-size:28px;font-weight:700;color:var(--text);letter-spacing:-.5px;margin-bottom:6px}
-.login-sub{color:var(--muted);font-size:13px;margin-bottom:28px;line-height:1.5}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;box-shadow:var(--sh-md)}
-.lf{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.lf label{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.lf input{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:11px 14px;border-radius:var(--r);font-size:13px;font-family:var(--sans);outline:none;width:100%;transition:all .12s}
+
+/* ── SECTION LABEL ── */
+.sec{font-size:10px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:1.4px;margin-bottom:14px;margin-top:4px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── KPI GRID ── */
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+@media(max-width:1100px){.kg{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.kg{grid-template-columns:1fr}}
+.kc{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:18px 20px 16px;box-shadow:var(--sh);cursor:pointer;
+  transition:all .15s;position:relative;overflow:hidden;
+}
+.kc:hover{box-shadow:var(--sh-md);transform:translateY(-2px);border-color:var(--border2)}
+.kc:hover .ka{opacity:1;transform:translateX(3px)}
+.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kc.cb::before{background:linear-gradient(90deg,#2563EB,#60A5FA)}
+.kc.cg::before{background:linear-gradient(90deg,#059669,#34D399)}
+.kc.cr::before{background:linear-gradient(90deg,#DC2626,#F87171)}
+.kc.ca::before{background:linear-gradient(90deg,#D97706,#FCD34D)}
+.kc.cp::before{background:linear-gradient(90deg,#7C3AED,#A78BFA)}
+.kh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kl{font-size:10px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:.9px}
+.ka{font-size:13px;color:var(--label);opacity:0;transition:all .15s}
+.kv{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text);letter-spacing:-.5px;line-height:1}
+.kv.pos{color:var(--green)}.kv.neg{color:var(--red)}
+.kpct{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:8px}
+.kpct.pos{background:var(--green-l);color:var(--green)}
+.kpct.neg{background:var(--red-l);color:var(--red)}
+.ks{font-size:10.5px;color:var(--label);margin-top:5px}
+
+/* ── CHART CARD ── */
+.cg2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:28px}
+.cg2.full{grid-template-columns:1fr}
+@media(max-width:900px){.cg2{grid-template-columns:1fr}}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh)}
+.ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.ct{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.1px}
+.cd{font-size:11px;color:var(--label);margin-top:2px;margin-bottom:14px}
+.cw{position:relative}
+
+/* ── TABLE ── */
+.tc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px;box-shadow:var(--sh)}
+.th{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.tt{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.1px}
+.thint{font-size:11px;color:var(--label)}
+.ts{overflow-x:auto;max-height:480px;overflow-y:auto}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--s2);color:var(--label);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;padding:8px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
+thead th:first-child{text-align:left}
+thead th.hi{color:var(--blue);background:var(--blue-l)}
+tbody td{padding:8px 14px;text-align:right;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--t2);white-space:nowrap}
+tbody td:first-child{text-align:left;font-family:var(--sans);font-size:12px;color:var(--text);max-width:220px}
+tbody td.hi{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--blue);background:var(--blue-l)}
+tbody tr:hover td{background:var(--s2)}
+tbody tr.rt td{font-weight:700;color:var(--text);background:var(--blue-l);border-top:2px solid var(--border2)}
+tbody tr.rt td.hi{background:#dbeafe}
+tbody tr.rs td{background:var(--s3);color:var(--muted);font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;font-family:var(--sans)}
+tbody tr.rs td:first-child{border-left:3px solid var(--blue)}
+.pct-pill{display:inline-flex;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
+.pct-pill.pos{background:var(--green-l);color:var(--green)}
+.pct-pill.neg{background:var(--red-l);color:var(--red)}
+
+/* ── EXEC SUMMARY ── */
+.ec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh);margin-bottom:24px}
+.ehi{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.eico{width:28px;height:28px;border-radius:8px;background:var(--blue-l);color:var(--blue);font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.etit{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.8px}
+.ei{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ei:last-child{border-bottom:none;padding-bottom:0}
+.edot{width:6px;height:6px;border-radius:50%;background:var(--blue);margin-top:5px;flex-shrink:0}
+.etxt{font-size:12.5px;color:var(--t2);line-height:1.65}
+strong.h{color:var(--text);font-weight:600}
+
+/* ── LOGIN ── */
+#lov{position:fixed;inset:0;background:linear-gradient(135deg,#EEF3FF 0%,#F5F7FB 60%,#EDE9FE 100%);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.lw{width:100%;max-width:420px}
+.ley{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px}
+.ltit{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.5px;margin-bottom:6px}
+.lsub{color:var(--muted);font-size:12.5px;margin-bottom:24px;line-height:1.55}
+.lcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px 28px 24px;box-shadow:var(--sh-lg)}
+.lf{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.lf label{font-size:10.5px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.lf input{background:var(--s2);border:1.5px solid var(--border);color:var(--text);padding:10px 13px;border-radius:var(--r);font-size:12.5px;font-family:var(--sans);outline:none;width:100%;transition:all .12s}
 .lf input:focus{border-color:var(--blue);background:var(--surface);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.btn-login{width:100%;padding:11px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .12s;margin-top:4px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
-.btn-login:hover{box-shadow:0 4px 16px rgba(37,99,235,.4);transform:translateY(-1px)}
-#login-err{color:var(--red);font-size:12px;margin-top:12px;background:var(--red-l);padding:10px 14px;border-radius:var(--r);display:none;border:1px solid rgba(220,38,38,.2)}
-.login-links{margin-top:16px;display:flex;gap:10px}
-.ll{font-size:12px;color:var(--blue);text-decoration:none;padding:7px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);transition:all .12s;font-weight:500}
-.ll:hover{border-color:var(--blue);background:var(--blue-l)}
+.lbtn{width:100%;padding:11px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .15s;margin-top:6px;box-shadow:0 3px 10px rgba(37,99,235,.35)}
+.lbtn:hover{box-shadow:0 5px 18px rgba(37,99,235,.45);transform:translateY(-1px)}
+#lerr{color:var(--red);font-size:11.5px;margin-top:10px;background:var(--red-l);padding:9px 13px;border-radius:var(--r);display:none;border:1px solid rgba(220,38,38,.2)}
+.llinks{margin-top:14px;display:flex;gap:8px}
+.ll{font-size:11.5px;color:var(--blue);text-decoration:none;padding:7px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);transition:all .12s;font-weight:500;box-shadow:var(--sh)}
+.ll:hover{border-color:rgba(37,99,235,.3);background:var(--blue-l)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  :root{--sidebar:0px}
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  #topbar{padding:0 16px}
+  #content{padding:16px}
+  .kg{grid-template-columns:repeat(2,1fr)}
+  .cg2{grid-template-columns:1fr}
+  #page-title{font-size:13px}
+}
 </style>
 </head>
 <body>
-<div id="login-overlay">
-  <div class="login-wrap">
-    <div class="login-eye">WM Center · Finance</div>
-    <div class="login-title">Finance Dashboard</div>
-    <div class="login-sub">Sign in with your API credentials, or leave blank to explore with demo data.</div>
-    <div class="login-card">
-      <div class="lf"><label>API Endpoint</label><input type="text" id="inp-url" placeholder="https://script.google.com/macros/s/.../exec (optional for demo)"></div>
-      <div class="lf"><label>Access Token</label><input type="password" id="inp-token" placeholder="Leave blank for demo mode"></div>
-      <button class="btn-login" onclick="doLogin()">Sign in →</button>
-      <div id="login-err">Invalid credentials. Check your endpoint and token.</div>
+
+<!-- LOGIN -->
+<div id="lov">
+  <div class="lw">
+    <div class="ley">WM Center · Finance</div>
+    <div class="ltit">Finance Dashboard</div>
+    <div class="lsub">Sign in with your API credentials, or leave blank to explore with demo data.</div>
+    <div class="lcard">
+      <div class="lf"><label>API Endpoint</label><input type="text" id="iurl" placeholder="https://script.google.com/macros/s/.../exec"></div>
+      <div class="lf"><label>Access Token</label><input type="password" id="itok" placeholder="Leave blank for demo mode"></div>
+      <button class="lbtn" onclick="doLogin()">Sign in →</button>
+      <div id="lerr">Invalid credentials. Check your endpoint and token.</div>
     </div>
-    <div class="login-links">
+    <div class="llinks">
       <a href="forecasting.html" class="ll">↗ Forecasting</a>
       <a href="bep.html" class="ll">↗ BEP Analysis</a>
     </div>
   </div>
 </div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
   <div class="logo">
     <div class="logo-lockup">
@@ -149,35 +243,36 @@ select{background:transparent;border:none;color:var(--text);padding:0 2px;font-s
     </div>
   </div>
   <nav>
-    <div class="nav-section">Analytics</div>
+    <div class="nav-group">Analytics</div>
     <div class="nav-item active" data-page="overview" onclick="nav(this)"><span class="nav-icon">◈</span>Overview</div>
     <div class="nav-item" data-page="pl" onclick="nav(this)"><span class="nav-icon">▤</span>P&amp;L</div>
     <div class="nav-item" data-page="neraca" onclick="nav(this)"><span class="nav-icon">⊞</span>Balance Sheet</div>
     <div class="nav-item" data-page="cashflow" onclick="nav(this)"><span class="nav-icon">⇄</span>Cash Flow</div>
-    <div class="nav-section">Other Modules</div>
+    <div class="nav-group">Other Modules</div>
     <a href="forecasting.html" class="nav-item"><span class="nav-icon">◎</span>Forecasting</a>
     <a href="bep.html" class="nav-item"><span class="nav-icon">◉</span>BEP Analysis</a>
   </nav>
   <div class="sidebar-footer">
-    <div class="refresh-row"><div class="refresh-dot"></div><span class="refresh-text">Live · 30s auto-refresh</span></div>
+    <div class="live-row"><div class="live-dot"></div><span class="live-text">Live · 30s refresh</span></div>
     <div id="last-refresh">Not yet refreshed</div>
     <button class="btn-logout" onclick="doLogout()">⎋ Sign out</button>
   </div>
 </div>
 
+<!-- MAIN -->
 <div id="main">
   <div id="topbar">
     <span id="page-title">Overview</span>
-    <div class="filter-pill">
-      <span class="filter-label">Month</span>
-      <select id="f-month" onchange="load()"></select>
+    <div class="fp" id="fp-month">
+      <span class="fl">Month</span>
+      <select id="fm" onchange="load()"></select>
     </div>
-    <div class="filter-pill" id="f-pt-wrap">
-      <span class="filter-label">Entity</span>
-      <select id="f-pt" onchange="load()"><option value="">All Entities</option></select>
+    <div class="fp" id="fp-pt">
+      <span class="fl">Entity</span>
+      <select id="fpt" onchange="load()"><option value="">All</option></select>
     </div>
-    <div class="toggle-rt" id="tog-rt" onclick="toggleRT()">
-      <div class="rt-dot"></div><span id="rt-lbl">Monthly</span>
+    <div class="tog-rt" id="trt" onclick="toggleRT()">
+      <div class="tog-d"></div><span id="rtl">Monthly</span>
     </div>
   </div>
   <div id="content"><div class="state-box"><div class="spinner"></div><span>Loading...</span></div></div>
@@ -185,585 +280,675 @@ select{background:transparent;border:none;color:var(--text);padding:0 2px;font-s
 
 <script>
 // ── DATA ─────────────────────────────────────────────────────
-const PT_LIST=['WMC','WMU','WMH','WMS','WMP','WMB','WMA','WMII','WMI'];
-const MONTHS=['January','February','March','April','May','June','July'];
-const PT_PROFILE={
-  WMC: {base:520,growth:.03,cogs:.22,opex:.31,depre:.04,vol:.05},
-  WMU: {base:310,growth:.05,cogs:.24,opex:.33,depre:.05,vol:.07},
-  WMH: {base:420,growth:.02,cogs:.20,opex:.28,depre:.04,vol:.04},
-  WMS: {base:180,growth:.08,cogs:.26,opex:.35,depre:.06,vol:.09},
-  WMP: {base:240,growth:.04,cogs:.23,opex:.32,depre:.05,vol:.06},
-  WMB: {base:120,growth:.12,cogs:.28,opex:.40,depre:.07,vol:.12},
-  WMA: {base:95, growth:.15,cogs:.30,opex:.45,depre:.08,vol:.15},
-  WMII:{base:200,growth:.03,cogs:.25,opex:.34,depre:.05,vol:.06},
-  WMI: {base:160,growth:.06,cogs:.27,opex:.36,depre:.06,vol:.08},
+const PTS=['WMC','WMU','WMH','WMS','WMP','WMB','WMA','WMII','WMI'];
+const MOS=['January','February','March','April','May','June','July'];
+const MO3=MOS.map(m=>m.slice(0,3));
+const PP={
+  WMC: {b:520,g:.03,cogs:.22,opex:.31,dep:.04,v:.05},
+  WMU: {b:310,g:.05,cogs:.24,opex:.33,dep:.05,v:.07},
+  WMH: {b:420,g:.02,cogs:.20,opex:.28,dep:.04,v:.04},
+  WMS: {b:180,g:.08,cogs:.26,opex:.35,dep:.06,v:.09},
+  WMP: {b:240,g:.04,cogs:.23,opex:.32,dep:.05,v:.06},
+  WMB: {b:120,g:.12,cogs:.28,opex:.40,dep:.07,v:.12},
+  WMA: {b:95, g:.15,cogs:.30,opex:.45,dep:.08,v:.15},
+  WMII:{b:200,g:.03,cogs:.25,opex:.34,dep:.05,v:.06},
+  WMI: {b:160,g:.06,cogs:.27,opex:.36,dep:.06,v:.08},
 };
-const SEASON=[.88,.91,.97,1.02,1.06,1.10,1.08];
-
+const SEA=[.88,.91,.97,1.02,1.06,1.10,1.08];
 function fnv(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return((h>>>0)%1000)/1000}
 
 const D={};
-MONTHS.forEach((m,mi)=>{
+MOS.forEach((m,mi)=>{
   D[m]={};
-  PT_LIST.forEach(pt=>{
-    const p=PT_PROFILE[pt];
-    const rev=p.base*1e6*Math.pow(1+p.growth,mi/12)*SEASON[mi]*(1+(fnv(pt+mi+'r')-.5)*p.vol);
+  PTS.forEach(pt=>{
+    const p=PP[pt];
+    const rev=p.b*1e6*Math.pow(1+p.g,mi/12)*SEA[mi]*(1+(fnv(pt+mi+'r')-.5)*p.v);
     const cogs=Math.abs(rev*p.cogs*(1+(fnv(pt+mi+'c')-.5)*.06));
     const opex=Math.abs(rev*p.opex*(1+(fnv(pt+mi+'o')-.5)*.08));
-    const depre=Math.abs(rev*p.depre);
+    const dep=Math.abs(rev*p.dep);
     const ebitda=rev-cogs-opex;
-    const ebit=ebitda-depre;
+    const ebit=ebitda-dep;
     const tax=ebit>0?ebit*.22:0;
     const net=ebit-tax;
-    D[m][pt]={rev,cogs,opex,depre,ebitda,ebit,tax,net};
+    D[m][pt]={rev,cogs,opex,dep,ebitda,ebit,tax,net};
   });
 });
-
 const CF={};
-MONTHS.forEach((m,mi)=>{
+MOS.forEach((m,mi)=>{
   CF[m]={};
-  PT_LIST.forEach(pt=>{
-    const p=PT_PROFILE[pt];
-    const ebitda=D[m][pt].ebitda;
-    const operating=ebitda*(.80+fnv(pt+mi+'cfo')*.25);
-    const investBase=p.base*1e6*(mi<3?.15:.08);
-    const investing=-(investBase*(.7+fnv(pt+mi+'cfi')*.6));
-    const ffBase=p.base*1e6*.05;
-    const financing=(fnv(pt+mi+'cff')>.7?1:-1)*ffBase*(.5+fnv(pt+mi+'cff2')*1.5);
-    CF[m][pt]={operating,investing,financing};
+  PTS.forEach(pt=>{
+    const p=PP[pt];
+    const e=D[m][pt].ebitda;
+    const op=e*(.80+fnv(pt+mi+'fo')*.25);
+    const inv=-(p.b*1e6*(mi<3?.15:.08)*(.7+fnv(pt+mi+'fi')*.6));
+    const fin=(fnv(pt+mi+'ff')>.7?1:-1)*p.b*1e6*.05*(.5+fnv(pt+mi+'ff2')*1.5);
+    CF[m][pt]={op:Math.abs(op),inv:Math.abs(inv),fin:Math.abs(fin)};
   });
 });
-
 const BS={
   assets:[
-    {name:'Cash & Equivalents',     v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(1.2+fnv(pt+'cash')*.8))},
-    {name:'Accounts Receivable',    v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.3+fnv(pt+'ar')*.4))},
-    {name:'Inventory',              v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.08+fnv(pt+'inv')*.12))},
-    {name:'Fixed Assets (Net)',     v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(1.5+fnv(pt+'fa')*1.2))},
-    {name:'Other Assets',           v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.15+fnv(pt+'oa')*.2))},
+    {n:'Cash & Equivalents',    v:PTS.map(pt=>PP[pt].b*1e6*(1.2+fnv(pt+'ca')*.8))},
+    {n:'Accounts Receivable',   v:PTS.map(pt=>PP[pt].b*1e6*(.3+fnv(pt+'ar')*.4))},
+    {n:'Inventory',             v:PTS.map(pt=>PP[pt].b*1e6*(.08+fnv(pt+'iv')*.12))},
+    {n:'Fixed Assets (Net)',    v:PTS.map(pt=>PP[pt].b*1e6*(1.5+fnv(pt+'fa')*1.2))},
+    {n:'Other Assets',          v:PTS.map(pt=>PP[pt].b*1e6*(.15+fnv(pt+'oa')*.2))},
   ],
   liabilities:[
-    {name:'Accounts Payable',       v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.2+fnv(pt+'ap')*.25))},
-    {name:'Short-term Debt',        v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.1+fnv(pt+'std')*.3))},
-    {name:'Long-term Debt',         v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.4+fnv(pt+'ltd')*.6))},
-    {name:'Other Liabilities',      v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.05+fnv(pt+'ol')*.15))},
+    {n:'Accounts Payable',      v:PTS.map(pt=>PP[pt].b*1e6*(.2+fnv(pt+'ap')*.25))},
+    {n:'Short-term Debt',       v:PTS.map(pt=>PP[pt].b*1e6*(.1+fnv(pt+'sd')*.3))},
+    {n:'Long-term Debt',        v:PTS.map(pt=>PP[pt].b*1e6*(.4+fnv(pt+'ld')*.6))},
+    {n:'Other Liabilities',     v:PTS.map(pt=>PP[pt].b*1e6*(.05+fnv(pt+'ol')*.15))},
   ],
   equity:[
-    {name:'Share Capital',          v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(1.0+fnv(pt+'sc')*.5))},
-    {name:'Retained Earnings',      v:PT_LIST.map(pt=>PT_PROFILE[pt].base*1e6*(.2+fnv(pt+'re')*.6))},
+    {n:'Share Capital',         v:PTS.map(pt=>PP[pt].b*1e6*(1.0+fnv(pt+'sc')*.5))},
+    {n:'Retained Earnings',     v:PTS.map(pt=>PP[pt].b*1e6*(.2+fnv(pt+'re')*.6))},
   ],
 };
 
 // ── STATE ────────────────────────────────────────────────────
 let curPage='overview', rtMode=false, timer=null;
-const C=['#2563EB','#059669','#D97706','#7C3AED','#DB2777','#0891B2','#EA580C','#DC2626','#4F46E5'];
-const CA=c=>c+'33';
 let charts={};
+const C=['#2563EB','#059669','#D97706','#7C3AED','#DB2777','#0891B2','#EA580C','#DC2626','#4F46E5'];
+const CL=c=>c+'28';
 
-function fmt(n,d=1){
-  if(n===null||n===undefined||isNaN(n))return'—';
-  const a=Math.abs(n),s=n<0?'-':'';
-  if(a>=1e9)return s+(a/1e9).toFixed(d).replace('.',',')+' bn';
-  if(a>=1e6)return s+(a/1e6).toFixed(d).replace('.',',')+' mn';
-  if(a>=1e3)return s+(a/1e3).toFixed(0)+' K';
-  return n.toLocaleString('id');
+function fmt(n,d=0){
+  if(n==null||isNaN(n))return'—';
+  const v=Math.abs(n)/1000;
+  const s=n<0?'-':'';
+  return s+v.toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d});
 }
-function cl(n){return n>0?'p':n<0?'n':''}
+function a(n){return Math.abs(n)}
+function pct(a,b){return b?((a/b)*100).toFixed(1)+'%':'—'}
 
 // ── FILTER HELPERS ───────────────────────────────────────────
-function gMonth(){return document.getElementById('f-month').value}
-function gPT(){return document.getElementById('f-pt').value}
-function gMonths(){return rtMode?MONTHS:[gMonth()]}
-function gPTs(pt){return pt?[pt]:PT_LIST}
+const gM=()=>document.getElementById('fm').value;
+const gPT=()=>document.getElementById('fpt').value;
+const gMos=()=>rtMode?MOS:[gM()];
+const gPTs=(p)=>(p||gPT())?[p||gPT()]:PTS;
 
-function sumField(field,pt){
-  const pts=gPTs(pt||gPT()), months=gMonths();
-  return months.reduce((s,m)=>s+pts.reduce((s2,p)=>s2+(D[m]?.[p]?.[field]||0),0),0);
+function sf(field,pt){
+  return gMos().reduce((s,m)=>s+gPTs(pt).reduce((s2,p)=>s2+a(D[m]?.[p]?.[field]||0),0),0);
 }
-function sumByPT(field){
-  const months=gMonths();
-  return PT_LIST.map(pt=>months.reduce((s,m)=>s+(D[m]?.[pt]?.[field]||0),0));
+function sbPT(field){
+  return PTS.map(pt=>gMos().reduce((s,m)=>s+a(D[m]?.[pt]?.[field]||0),0));
 }
-function sumByMonth(field,pt){
-  const pts=gPTs(pt||gPT());
-  return MONTHS.map(m=>pts.reduce((s,p)=>s+(D[m]?.[p]?.[field]||0),0));
+function sbM(field,pt){
+  return MOS.map(m=>gPTs(pt).reduce((s,p)=>s+a(D[m]?.[p]?.[field]||0),0));
 }
-function cfSumField(field,pt){
-  const pts=gPTs(pt||gPT()), months=gMonths();
-  return months.reduce((s,m)=>s+pts.reduce((s2,p)=>s2+(CF[m]?.[p]?.[field]||0),0),0);
+function cfSf(field,pt){
+  return gMos().reduce((s,m)=>s+gPTs(pt).reduce((s2,p)=>s2+a(CF[m]?.[p]?.[field]||0),0),0);
 }
-function cfByMonth(field,pt){
-  const pts=gPTs(pt||gPT());
-  return MONTHS.map(m=>pts.reduce((s,p)=>s+(CF[m]?.[p]?.[field]||0),0));
-}
-function cfByPT(field){
-  const months=gMonths();
-  return PT_LIST.map(pt=>months.reduce((s,m)=>s+(CF[m]?.[pt]?.[field]||0),0));
+function cfSbM(field,pt){return MOS.map(m=>gPTs(pt).reduce((s,p)=>s+a(CF[m]?.[p]?.[field]||0),0));}
+function cfSbPT(field){return PTS.map(pt=>gMos().reduce((s,m)=>s+a(CF[m]?.[pt]?.[field]||0),0));}
+
+function per(){
+  if(rtMode)return`YTD Jan–${MOS[MOS.length-1]}`;
+  return gM()+(gPT()?' · '+gPT():'');
 }
 
-function period(){
-  if(rtMode) return `YTD Jan–${MONTHS[MONTHS.length-1]}`;
-  const pt=gPT();
-  return `${gMonth()}${pt?' · '+pt:' · All Entities'}`;
+// ── API ──────────────────────────────────────────────────────
+let API_URL='', API_TOKEN='';
+async function apiFetch(action, params={}){
+  const qp=new URLSearchParams({token:API_TOKEN, action, ...params});
+  const res=await fetch(`${API_URL}?${qp}`);
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const data=await res.json();
+  if(data.error) throw new Error(data.error);
+  return data;
 }
 
 // ── LOGIN / LOGOUT ───────────────────────────────────────────
-function doLogin(){
-  sessionStorage.setItem('wmc_in','1');
-  document.getElementById('login-overlay').style.display='none';
-  initDash();
+async function doLogin(){
+  const url=document.getElementById('iurl').value.trim();
+  const tok=document.getElementById('itok').value.trim();
+  const btn=document.querySelector('.lbtn');
+  const err=document.getElementById('lerr');
+  err.style.display='none';
+
+  if(!url||!tok){
+    err.textContent='Both API endpoint and access token are required.';
+    err.style.display='block';
+    return;
+  }
+
+  btn.textContent='Signing in...';
+  btn.disabled=true;
+
+  try {
+    const qp=new URLSearchParams({token:tok, action:'sheets'});
+    const res=await fetch(`${url}?${qp}`);
+    const data=await res.json();
+    if(data.error||!data.months) throw new Error(data.error||'Invalid response');
+
+    API_URL=url; API_TOKEN=tok;
+    sessionStorage.setItem('wmc_url',url);
+    sessionStorage.setItem('wmc_tok',tok);
+    document.getElementById('lov').style.display='none';
+    initDash(data.months);
+  } catch(e){
+    err.textContent='Sign in failed — invalid token or endpoint. Please check and try again.';
+    err.style.display='block';
+  } finally {
+    btn.textContent='Sign in →';
+    btn.disabled=false;
+  }
 }
+
 function doLogout(){
-  sessionStorage.removeItem('wmc_in');
-  document.getElementById('login-overlay').style.display='flex';
+  sessionStorage.removeItem('wmc_url');
+  sessionStorage.removeItem('wmc_tok');
+  API_URL=''; API_TOKEN='';
+  document.getElementById('iurl').value='';
+  document.getElementById('itok').value='';
+  document.getElementById('lov').style.display='flex';
 }
-window.addEventListener('DOMContentLoaded',()=>{
-  if(sessionStorage.getItem('wmc_in')){
-    document.getElementById('login-overlay').style.display='none';
-    initDash();
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  const url=sessionStorage.getItem('wmc_url');
+  const tok=sessionStorage.getItem('wmc_tok');
+  if(url&&tok){
+    try {
+      const qp=new URLSearchParams({token:tok,action:'sheets'});
+      const res=await fetch(`${url}?${qp}`);
+      const data=await res.json();
+      if(data.error||!data.months) throw new Error();
+      API_URL=url; API_TOKEN=tok;
+      document.getElementById('lov').style.display='none';
+      initDash(data.months);
+    } catch(e){
+      // Session expired or token invalid — show login
+      sessionStorage.removeItem('wmc_url');
+      sessionStorage.removeItem('wmc_tok');
+    }
   }
 });
 
 // ── INIT ─────────────────────────────────────────────────────
-function initDash(){
-  const ms=document.getElementById('f-month');
+function initDash(months){
+  // Months from API if available, else fall back to dummy months
+  const monthList = months || MOS;
+  const ms=document.getElementById('fm');
   ms.innerHTML='';
-  MONTHS.forEach((m,i)=>{const o=document.createElement('option');o.value=m;o.textContent=m;if(i===MONTHS.length-1)o.selected=true;ms.appendChild(o);});
-  const ps=document.getElementById('f-pt');
+  monthList.forEach((m,i)=>{const o=document.createElement('option');o.value=m;o.textContent=m;if(i===monthList.length-1)o.selected=true;ms.appendChild(o);});
+  const ps=document.getElementById('fpt');
   ps.innerHTML='<option value="">All Entities</option>';
-  PT_LIST.forEach(pt=>{const o=document.createElement('option');o.value=pt;o.textContent=pt;ps.appendChild(o);});
+  PTS.forEach(pt=>{const o=document.createElement('option');o.value=pt;o.textContent=pt;ps.appendChild(o);});
   load();
   if(timer)clearInterval(timer);
   timer=setInterval(()=>{document.getElementById('last-refresh').textContent='Updated '+new Date().toLocaleTimeString('en');},30000);
 }
-
 function toggleRT(){
   rtMode=!rtMode;
-  const el=document.getElementById('tog-rt');
-  el.classList.toggle('active',rtMode);
-  document.getElementById('rt-lbl').textContent=rtMode?'YTD':'Monthly';
-  document.getElementById('f-month').closest('.filter-pill').style.opacity=rtMode?'.4':'1';
-  document.getElementById('f-month').disabled=rtMode;
+  const el=document.getElementById('trt');
+  el.classList.toggle('on',rtMode);
+  document.getElementById('rtl').textContent=rtMode?'YTD':'Monthly';
+  document.getElementById('fp-month').style.opacity=rtMode?'.4':'1';
+  document.getElementById('fm').disabled=rtMode;
   load();
 }
 
 // ── NAV ──────────────────────────────────────────────────────
 function nav(el){
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.nav-item[data-page]').forEach(i=>i.classList.remove('active'));
   el.classList.add('active');
   curPage=el.dataset.page;
   const T={overview:'Overview',pl:'Profit & Loss',neraca:'Balance Sheet',cashflow:'Cash Flow'};
   document.getElementById('page-title').textContent=T[curPage]||curPage;
-  document.getElementById('f-pt-wrap').style.display=curPage==='neraca'?'none':'flex';
+  document.getElementById('fp-pt').style.display=curPage==='neraca'?'none':'flex';
   load();
 }
 function goPage(p){const el=document.querySelector(`.nav-item[data-page="${p}"]`);if(el)nav(el);}
 function load(){
   document.getElementById('last-refresh').textContent='Updated '+new Date().toLocaleTimeString('en');
-  if(curPage==='overview')renderOverview();
-  else if(curPage==='pl')renderPL();
-  else if(curPage==='neraca')renderNeraca();
-  else if(curPage==='cashflow')renderCashflow();
+  const fns={overview:renderOverview,pl:renderPL,neraca:renderNeraca,cashflow:renderCashflow};
+  (fns[curPage]||renderOverview)();
 }
 
-// ── CHART UTILS ──────────────────────────────────────────────
+// ── CHART HELPERS ─────────────────────────────────────────────
 function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
-const gridOpts={color:'#F0F2F9'};
-const tickOpts={color:'#94A3B8',font:{size:10}};
-const legOpts={labels:{color:'#64748B',font:{size:10,family:'Inter'},boxWidth:10,padding:14}};
 
-function makeBar(id,labels,datasets,stacked=false){
+const baseOpts={
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#64748B',font:{size:10,family:'Inter'},boxWidth:8,padding:16,usePointStyle:true,pointStyle:'circle',filter:i=>i.text!==''}}},
+  scales:{
+    x:{ticks:{color:'#94A3B8',font:{size:10}},grid:{color:'#F0F3FA'},border:{display:false}},
+    y:{ticks:{color:'#94A3B8',font:{size:10},callback:v=>fmt(v)},grid:{color:'#F0F3FA'},border:{display:false}}
+  }
+};
+
+// Bar + detached line overlay (like reference image)
+function makeCombo(id, labels, barDatasets, lineData, lineLabelFn){
   dc(id);
-  // Add trend line overlay for each dataset
-  const trendDatasets=datasets.flatMap(ds=>{
-    const data=ds.data.map(v=>Math.abs(v));
-    return [
-      {...ds, data},
-      {
-        type:'line', label:'', data,
-        borderColor:ds.borderColor, borderWidth:1.5,
-        pointRadius:3, pointBackgroundColor:ds.borderColor,
-        fill:false, tension:.35, borderDash:[],
-        tooltip:{enabled:false},
-      }
-    ];
-  });
+  const lineDs={
+    type:'line', label:'', data:lineData,
+    borderColor:'#FFF', borderWidth:2,
+    pointRadius:5, pointBackgroundColor:'#FFF',
+    pointBorderColor:C[0], pointBorderWidth:2,
+    fill:false, tension:.4, order:0,
+    yAxisID:'y2',
+    datalabels:{display:false},
+  };
+
+  // Build datasets
+  const datasets=[
+    ...barDatasets.map(d=>({...d,order:1,yAxisID:'y'})),
+    lineDs
+  ];
+
+  const maxBar=Math.max(...barDatasets.flatMap(d=>d.data));
+  const maxLine=Math.max(...lineData);
+  const minLine=Math.min(...lineData);
+
   charts[id]=new Chart(document.getElementById(id),{
     type:'bar',
-    data:{labels, datasets:trendDatasets},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{
-        color:'#64748B',font:{size:10,family:'Inter'},boxWidth:10,padding:14,
-        filter:item=>item.text!==''
-      }}},
-      scales:{
-        x:{stacked,ticks:tickOpts,grid:gridOpts,border:{display:false}},
-        y:{stacked,ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}
-      }
-    }
-  });
-}
-function makeLine(id,labels,datasets,showZero=false){
-  dc(id);
-  // Add zero reference line as a flat dataset if needed
-  const allDatasets = showZero
-    ? [...datasets, {
-        label:'',data:labels.map(()=>0),
-        borderColor:'#94A3B8',borderWidth:1.5,borderDash:[5,5],
-        pointRadius:0,fill:false,tension:0,
-        tooltip:{enabled:false},
-      }]
-    : datasets;
-  charts[id]=new Chart(document.getElementById(id),{
-    type:'line',data:{labels,datasets:allDatasets},
-    options:{responsive:true,maintainAspectRatio:false,
+    data:{labels,datasets},
+    options:{
+      ...baseOpts,
       plugins:{
-        legend:{
-          labels:{
-            color:'#64748B',font:{size:10,family:'Inter'},boxWidth:10,padding:14,
-            filter: item => item.text !== '' // hide zero-line from legend
+        ...baseOpts.plugins,
+        tooltip:{
+          callbacks:{
+            label:ctx=>{
+              if(ctx.dataset.yAxisID==='y2') return` ${ctx.parsed.y.toFixed(1)}%`;
+              return` ${fmt(ctx.parsed.y)}`;
+            }
           }
         }
       },
       scales:{
-        x:{ticks:tickOpts,grid:gridOpts,border:{display:false}},
-        y:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}
-      }
+        x:{ticks:{color:'#94A3B8',font:{size:10}},grid:{color:'#F0F3FA'},border:{display:false}},
+        y:{ticks:{color:'#94A3B8',font:{size:10},callback:v=>fmt(v,0)},grid:{color:'#F0F3FA'},border:{display:false}},
+        y2:{
+          position:'right',
+          min: Math.max(0, minLine*0.7),
+          max: maxLine*1.35,
+          ticks:{color:'#94A3B8',font:{size:10},callback:v=>v.toFixed(0)+'%'},
+          grid:{display:false},border:{display:false}
+        }
+      },
+      // Draw % labels on line points
+      animation:{onComplete:function(){
+        const chart=this;
+        const ctx=chart.ctx;
+        const ds=chart.data.datasets.find(d=>d.yAxisID==='y2');
+        if(!ds) return;
+        const meta=chart.getDatasetMeta(chart.data.datasets.indexOf(ds));
+        ctx.save();
+        ctx.font='bold 10px Inter';
+        ctx.fillStyle='#334155';
+        ctx.textAlign='center';
+        meta.data.forEach((pt,i)=>{
+          const v=ds.data[i];
+          if(v!=null) ctx.fillText(v.toFixed(1)+'%', pt.x, pt.y-10);
+        });
+        ctx.restore();
+      }}
     }
   });
 }
-function makeBarH(id,labels,data,colors){
-  const absData=data.map(v=>Math.abs(v));
+
+// Simple line chart (MtM multiple lines)
+function makeLine(id,labels,datasets){
   dc(id);
   charts[id]=new Chart(document.getElementById(id),{
-    type:'bar',
-    data:{labels,datasets:[
-      {data:absData,backgroundColor:colors,borderRadius:4},
-      {type:'line',label:'',data:absData,borderColor:'#2563EB',borderWidth:1.5,
-       pointRadius:3,pointBackgroundColor:'#2563EB',fill:false,tension:.35,
-       tooltip:{enabled:false}}
-    ]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}},
-        y:{ticks:{...tickOpts,font:{size:10}},grid:{display:false},border:{display:false}}
+    type:'line',data:{labels,datasets},
+    options:{...baseOpts,
+      elements:{line:{tension:.4}},
+      plugins:{...baseOpts.plugins,
+        tooltip:{mode:'index',intersect:false}
       }
     }
   });
 }
 
-const MO=MONTHS.map(m=>m.slice(0,3));
+// Bar chart (horizontal or vertical)
+function makeBar(id,labels,datasets,horiz=false){
+  dc(id);
+  charts[id]=new Chart(document.getElementById(id),{
+    type:'bar',data:{labels,datasets},
+    options:{
+      ...baseOpts,
+      indexAxis:horiz?'y':'x',
+      plugins:{...baseOpts.plugins},
+      scales:horiz?{
+        x:{ticks:{color:'#94A3B8',font:{size:10},callback:v=>fmt(v)},grid:{color:'#F0F3FA'},border:{display:false}},
+        y:{ticks:{color:'#94A3B8',font:{size:10}},grid:{display:false},border:{display:false}}
+      }:{
+        x:{ticks:{color:'#94A3B8',font:{size:10}},grid:{color:'#F0F3FA'},border:{display:false}},
+        y:{ticks:{color:'#94A3B8',font:{size:10},callback:v=>fmt(v)},grid:{color:'#F0F3FA'},border:{display:false}}
+      }
+    }
+  });
+}
 
 // ── OVERVIEW ─────────────────────────────────────────────────
 function renderOverview(){
-  const pt=gPT();
-  const rev=sumField('rev'), ebitda=sumField('ebitda'), net=sumField('net');
-  const cfo=cfSumField('operating');
+  const pt=gPT(), p=per();
+  const rev=sf('rev'), ebitda=sf('ebitda'), net=sf('net'), cfo=cfSf('op');
   const ep=rev?(ebitda/rev*100).toFixed(1):0;
   const np=rev?(net/rev*100).toFixed(1):0;
-  const per=period();
 
-  // Per-PT for ranking table
-  const ptRevs=PT_LIST.map(p=>({pt:p,rev:sumField('rev',p),net:sumField('net',p),ebitda:sumField('ebitda',p)}))
-    .sort((a,b)=>b.rev-a.rev);
+  // MtM combo data
+  const mtmRev=sbM('rev'), mtmCost=MOS.map(m=>gPTs(pt).reduce((s,p)=>s+a(D[m]?.[p]?.cogs||0)+a(D[m]?.[p]?.opex||0),0));
+  const mtmMargin=MOS.map((_,i)=>mtmRev[i]?((mtmRev[i]-mtmCost[i])/mtmRev[i]*100):0);
+  const mtmEbitda=sbM('ebitda'), mtmNet=sbM('net');
+  const ebitdaPct=MOS.map((_,i)=>mtmRev[i]?(mtmEbitda[i]/mtmRev[i]*100):0);
 
-  // MtM arrays
-  const mtmRev=sumByMonth('rev'), mtmEbitda=sumByMonth('ebitda'), mtmNet=sumByMonth('net');
-
-  // Waterfall
-  const cogs=sumField('cogs'), opex=sumField('opex'), depre=sumField('depre'), tax=sumField('tax');
-  const grossP=rev-cogs, ebit=ebitda-depre;
+  const ptRevs=PTS.map(p=>({pt:p,rev:sf('rev',p),net:sf('net',p),ebitda:sf('ebitda',p)})).sort((a,b)=>b.rev-a.rev);
+  const totalR=sf('rev')||1;
 
   document.getElementById('content').innerHTML=`
-    <div class="sec-label">Key Performance Indicators · ${per}</div>
-    <div class="kpi-grid">
-      <div class="kpi-card c-blue" onclick="goPage('pl')">
-        <div class="kpi-head"><span class="kpi-lbl">Revenue</span><span class="kpi-arr">↗</span></div>
-        <div class="kpi-val">${fmt(rev)}</div>
-        <div class="kpi-sub">${per}</div>
-      </div>
-      <div class="kpi-card c-purple" onclick="goPage('pl')">
-        <div class="kpi-head"><span class="kpi-lbl">EBITDA</span><span class="kpi-arr">↗</span></div>
-        <div class="kpi-val ${ebitda>=0?'pos':'neg'}">${fmt(ebitda)}</div>
-        <div class="kpi-pct ${ep>=0?'pos':'neg'}">${ep>=0?'▲':'▼'} ${Math.abs(ep)}% of Revenue</div>
-      </div>
-      <div class="kpi-card ${net>=0?'c-green':'c-red'}" onclick="goPage('pl')">
-        <div class="kpi-head"><span class="kpi-lbl">Net Profit</span><span class="kpi-arr">↗</span></div>
-        <div class="kpi-val ${net>=0?'pos':'neg'}">${fmt(net)}</div>
-        <div class="kpi-pct ${np>=0?'pos':'neg'}">${np>=0?'▲':'▼'} ${Math.abs(np)}% Margin</div>
-      </div>
-      <div class="kpi-card c-amber" onclick="goPage('cashflow')">
-        <div class="kpi-head"><span class="kpi-lbl">Operating Cash Flow</span><span class="kpi-arr">↗</span></div>
-        <div class="kpi-val ${cfo>=0?'pos':'neg'}">${fmt(cfo)}</div>
-        <div class="kpi-sub">${per}</div>
-      </div>
+  <div class="sec">Key Performance Indicators · ${p}</div>
+  <div class="kg">
+    <div class="kc cb" onclick="goPage('pl')">
+      <div class="kh"><span class="kl">Revenue</span><span class="ka">↗</span></div>
+      <div class="kv">${fmt(rev)}</div><div class="ks">${p}</div>
     </div>
-
-    <div class="sec-label">Revenue vs Cost · Month to Month</div>
-    <div class="chart-grid" style="margin-bottom:28px">
-      <div class="chart-card" style="grid-column:1/-1">
-        <div class="chart-head"><span class="chart-title">Revenue · EBITDA · Net Profit</span><span class="chart-sub">${pt||'Consolidated'}</span></div>
-        <div class="chart-wrap" style="height:260px"><canvas id="ch-mtm"></canvas></div>
-      </div>
+    <div class="kc cp" onclick="goPage('pl')">
+      <div class="kh"><span class="kl">EBITDA</span><span class="ka">↗</span></div>
+      <div class="kv pos">${fmt(ebitda)}</div>
+      <div class="kpct pos">▲ ${ep}% of Revenue</div>
     </div>
-
-    <div class="chart-grid" style="margin-bottom:28px">
-      <div class="chart-card">
-        <div class="chart-head"><span class="chart-title">Revenue by Entity</span><span class="chart-sub">${per}</span></div>
-        <div class="chart-wrap" style="height:240px"><canvas id="ch-rev-pt"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-head"><span class="chart-title">Net Profit by Entity</span><span class="chart-sub">${per}</span></div>
-        <div class="chart-wrap" style="height:240px"><canvas id="ch-net-pt"></canvas></div>
-      </div>
+    <div class="kc ${net>=0?'cg':'cr'}" onclick="goPage('pl')">
+      <div class="kh"><span class="kl">Net Profit</span><span class="ka">↗</span></div>
+      <div class="kv ${net>=0?'pos':'neg'}">${fmt(net)}</div>
+      <div class="kpct ${net>=0?'pos':'neg'}">${net>=0?'▲':'▼'} ${Math.abs(np)}% Margin</div>
     </div>
-
-    <div class="sec-label">Cost Structure · Waterfall</div>
-    <div class="chart-card" style="margin-bottom:28px">
-      <div class="chart-head"><span class="chart-title">Revenue → Net Profit Breakdown</span><span class="chart-sub">${per}</span></div>
-      <div class="chart-wrap" style="height:280px"><canvas id="ch-wf"></canvas></div>
+    <div class="kc ca" onclick="goPage('cashflow')">
+      <div class="kh"><span class="kl">Operating Cash Flow</span><span class="ka">↗</span></div>
+      <div class="kv pos">${fmt(cfo)}</div><div class="ks">${p}</div>
     </div>
+  </div>
 
-    <div class="sec-label">Entity Performance Ranking</div>
-    <div class="tbl-card">
-      <div class="tbl-bar"><span class="tbl-title">Entity Comparison · ${per}</span><span class="tbl-hint">Click row for entity detail</span></div>
-      <div class="tbl-scroll">
-        <table class="dt">
-          <thead><tr><th>#</th><th>Entity</th><th>Revenue</th><th>EBITDA</th><th>EBITDA %</th><th>Net Profit</th><th>Net Margin</th></tr></thead>
-          <tbody>
-          ${ptRevs.map((r,i)=>{
-            const ep2=r.rev?(r.ebitda/r.rev*100).toFixed(1):0;
-            const np2=r.rev?(r.net/r.rev*100).toFixed(1):0;
-            return`<tr style="cursor:pointer" onclick="document.getElementById('f-pt').value='${r.pt}';load()">
-              <td style="color:var(--label);font-weight:600">${i+1}</td>
-              <td><strong>${r.pt}</strong></td>
-              <td>${fmt(Math.abs(r.rev))}</td>
-              <td>${fmt(Math.abs(r.ebitda))}</td>
-              <td><span class="kpi-pct ${ep2>=0?'pos':'neg'}" style="margin:0;padding:2px 7px">${ep2}%</span></td>
-              <td>${fmt(Math.abs(r.net))}</td>
-              <td><span class="kpi-pct ${np2>=0?'pos':'neg'}" style="margin:0;padding:2px 7px">${np2}%</span></td>
-            </tr>`;
-          }).join('')}
-          </tbody>
-        </table>
-      </div>
+  <div class="sec">Revenue, Cost & Margin Trajectory · ${pt||'Consolidated'}</div>
+  <div class="cg2 full" style="margin-bottom:28px">
+    <div class="cc">
+      <div class="ch"><span class="ct">Revenue vs Cost</span><span style="font-size:10px;color:var(--label)">Bars: Revenue & Cost · Line: EBITDA Margin %</span></div>
+      <div class="cw" style="height:260px"><canvas id="ch-combo"></canvas></div>
     </div>
+  </div>
 
-    <div class="sec-label">Executive Summary</div>
-    <div class="exec-card">
-      <div class="exec-head"><div class="exec-ico">📋</div><div class="exec-title">Financial Highlights · ${per}</div></div>
-      <div class="exec-item"><div class="exec-dot"></div><div class="exec-text">Consolidated revenue reached <span class="exec-hi">${fmt(rev)}</span> for ${per}. Top contributor is <span class="exec-hi">${ptRevs[0].pt}</span> at ${fmt(ptRevs[0].rev)} (${rev?(ptRevs[0].rev/rev*100).toFixed(0):0}% of total).</div></div>
-      <div class="exec-item"><div class="exec-dot"></div><div class="exec-text">EBITDA margin stands at <span class="exec-hi">${ep}%</span>. Net profit margin at <span class="exec-hi">${np}%</span>. ${net>=0?'Group is profitable for this period.':'Group is currently loss-making — review cost structure.'}</div></div>
-      <div class="exec-item"><div class="exec-dot"></div><div class="exec-text">${ptRevs.filter(r=>r.net<0).length} ${ptRevs.filter(r=>r.net<0).length===1?'entity is':'entities are'} currently loss-making: <span class="exec-hi">${ptRevs.filter(r=>r.net<0).map(r=>r.pt).join(', ')||'none'}</span>. Monitor closely for cost optimization opportunities.</div></div>
-      <div class="exec-item"><div class="exec-dot"></div><div class="exec-text">Operating cash flow at <span class="exec-hi">${fmt(cfo)}</span>. <em style="color:var(--label)">Update this section via the Executive Summary sheet for period-specific narrative.</em></div></div>
-    </div>`;
+  <div class="sec">Trend Analysis · ${pt||'Consolidated'}</div>
+  <div class="cg2" style="margin-bottom:28px">
+    <div class="cc">
+      <div class="ch"><span class="ct">P&L Trend · Month to Month</span></div>
+      <div class="cd">Revenue · EBITDA · Net Profit</div>
+      <div class="cw" style="height:220px"><canvas id="ch-pl-mtm"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="ch"><span class="ct">Revenue by Entity</span></div>
+      <div class="cd">${p}</div>
+      <div class="cw" style="height:220px"><canvas id="ch-rev-pt"></canvas></div>
+    </div>
+  </div>
 
-  // MtM line
-  makeLine('ch-mtm',MO,[
-    {label:'Revenue',   data:mtmRev,    borderColor:C[0],backgroundColor:CA(C[0]),fill:true,tension:.35,pointRadius:4,pointBackgroundColor:C[0],borderWidth:2.5},
-    {label:'EBITDA',    data:mtmEbitda, borderColor:C[3],backgroundColor:CA(C[3]),fill:true,tension:.35,pointRadius:4,pointBackgroundColor:C[3],borderWidth:2.5},
-    {label:'Net Profit',data:mtmNet,    borderColor:C[1],backgroundColor:CA(C[1]),fill:true,tension:.35,pointRadius:4,pointBackgroundColor:C[1],borderWidth:2.5},
-  ], true);
+  <div class="sec">Cost Structure · Waterfall</div>
+  <div class="cg2 full" style="margin-bottom:28px">
+    <div class="cc">
+      <div class="ch"><span class="ct">Revenue → Net Profit Breakdown</span><span style="font-size:10px;color:var(--label)">${p}</span></div>
+      <div class="cw" style="height:260px"><canvas id="ch-wf"></canvas></div>
+    </div>
+  </div>
 
-  // Rev by PT horizontal bar
-  const ptR=sumByPT('rev');
-  makeBarH('ch-rev-pt',PT_LIST,ptR,ptR.map((_,i)=>C[i%C.length]+'BB'));
+  <div class="sec">Entity Performance Ranking</div>
+  <div class="tc">
+    <div class="th"><span class="tt">Entity Comparison · ${p}</span><span class="thint">Click row to filter</span></div>
+    <div class="ts">
+      <table>
+        <thead><tr><th>#</th><th>Entity</th><th class="hi">Revenue (Rp'000)</th><th>Share</th><th class="hi">EBITDA (Rp'000)</th><th>EBITDA %</th><th class="hi">Net Profit (Rp'000)</th><th>Net Margin</th></tr></thead>
+        <tbody>
+        ${ptRevs.map((r,i)=>{
+          const ep2=r.rev?(r.ebitda/r.rev*100).toFixed(1):0;
+          const np2=r.rev?(r.net/r.rev*100).toFixed(1):0;
+          const share=(r.rev/totalR*100).toFixed(0)+'%';
+          return`<tr style="cursor:pointer" onclick="document.getElementById('fpt').value='${r.pt}';load()">
+            <td style="color:var(--label);font-weight:700;font-family:var(--mono)">${i+1}</td>
+            <td><strong>${r.pt}</strong></td>
+            <td class="hi">${fmt(a(r.rev))}</td>
+            <td><span class="pct-pill pos">${share}</span></td>
+            <td class="hi">${fmt(a(r.ebitda))}</td>
+            <td><span class="pct-pill ${ep2>=0?'pos':'neg'}">${ep2}%</span></td>
+            <td class="hi">${fmt(a(r.net))}</td>
+            <td><span class="pct-pill ${np2>=0?'pos':'neg'}">${np2}%</span></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-  // Net by PT horizontal bar
-  const ptN=sumByPT('net');
-  makeBarH('ch-net-pt',PT_LIST,ptN,ptN.map(v=>v>=0?C[1]+'BB':C[7]+'BB'));
+  <div class="sec">Executive Summary</div>
+  <div class="ec">
+    <div class="ehi"><div class="eico">📋</div><div class="etit">Financial Highlights · ${p}</div></div>
+    <div class="ei"><div class="edot"></div><div class="etxt">Consolidated revenue reached <strong class="h">${fmt(rev)}</strong> for ${p}. Top contributor: <strong class="h">${ptRevs[0].pt}</strong> at ${fmt(ptRevs[0].rev)} (${(ptRevs[0].rev/totalR*100).toFixed(0)}% of total).</div></div>
+    <div class="ei"><div class="edot"></div><div class="etxt">EBITDA margin at <strong class="h">${ep}%</strong>. Net profit margin at <strong class="h">${Math.abs(np)}%</strong>. ${net>=0?'Group is profitable for this period.':'Group is loss-making — review cost structure.'}</div></div>
+    <div class="ei"><div class="edot"></div><div class="etxt">Loss-making entities: <strong class="h">${ptRevs.filter(r=>r.net<0).map(r=>r.pt).join(', ')||'None'}</strong>. ${ptRevs.filter(r=>r.net<0).length?'Monitor for cost optimization.':'All entities are profitable this period.'}</div></div>
+    <div class="ei"><div class="edot"></div><div class="etxt">Operating cash flow at <strong class="h">${fmt(cfo)}</strong>. <em style="color:var(--label)">Update this section via the Executive Summary sheet for period-specific narrative.</em></div></div>
+  </div>`;
+
+  // Revenue vs Cost combo chart (bar + detached line)
+  makeCombo('ch-combo', MO3,
+    [
+      {label:'Revenue', data:mtmRev, backgroundColor:CL(C[0]), borderColor:C[0], borderWidth:1.5, borderRadius:5},
+      {label:'Total Cost', data:mtmCost, backgroundColor:CL(C[7]), borderColor:C[7], borderWidth:1.5, borderRadius:5},
+    ],
+    mtmMargin
+  );
+
+  // P&L trend line
+  makeLine('ch-pl-mtm', MO3, [
+    {label:'Revenue',    data:mtmRev,    borderColor:C[0], backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:C[0]},
+    {label:'EBITDA',     data:mtmEbitda, borderColor:C[3], backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:C[3]},
+    {label:'Net Profit', data:mtmNet,    borderColor:C[1], backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:C[1]},
+  ]);
+
+  // Revenue by entity (horizontal bar)
+  const ptR=sbPT('rev');
+  makeBar('ch-rev-pt', PTS, [{
+    label:'Revenue', data:ptR,
+    backgroundColor:PTS.map((_,i)=>CL(C[i%C.length])),
+    borderColor:PTS.map((_,i)=>C[i%C.length]),
+    borderWidth:1.5, borderRadius:5
+  }], true);
 
   // Waterfall
   dc('ch-wf');
-  const wfL=['Revenue','- COGS','Gross Profit','- OPEX','EBITDA','- D&A','EBIT','- Tax','Net Profit'];
-  const wfV=[rev,-cogs,grossP,-opex,ebitda,-depre,ebit,-tax,net];
-  const wfBC=wfV.map((v,i)=>i===0?C[0]+'CC':i===8?(v>=0?C[1]+'CC':C[7]+'CC'):(v>=0?C[1]+'99':C[7]+'99'));
+  const cogs=sf('cogs'), opex=sf('opex'), dep=sf('dep'), tax=sf('tax');
+  const gP=rev-cogs, eb=ebitda-dep;
+  const wfL=['Revenue','COGS','Gross Profit','OPEX','EBITDA','D&A','EBIT','Tax','Net Profit'];
+  const wfV=[rev,cogs,gP,opex,ebitda,dep,eb,tax,net].map(v=>a(v));
+  const wfC=[C[0],C[7],C[1],C[7],C[3],C[7],C[3],C[7],net>=0?C[1]:C[8]].map(c=>CL(c));
+  const wfBC=[C[0],C[7],C[1],C[7],C[3],C[7],C[3],C[7],net>=0?C[1]:C[8]];
   charts['ch-wf']=new Chart(document.getElementById('ch-wf'),{
-    type:'bar',data:{labels:wfL,datasets:[{data:wfV,backgroundColor:wfBC,borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:d=>' '+fmt(d.raw)}}},
-      scales:{x:{ticks:tickOpts,grid:{display:false},border:{display:false}},
-              y:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}}}
+    type:'bar',
+    data:{labels:wfL,datasets:[{data:wfV,backgroundColor:wfC,borderColor:wfBC,borderWidth:1.5,borderRadius:5}]},
+    options:{...baseOpts,plugins:{...baseOpts.plugins,legend:{display:false},tooltip:{callbacks:{label:d=>' '+fmt(d.raw)}}}}
   });
 }
 
 // ── P&L ──────────────────────────────────────────────────────
 function renderPL(){
-  const pt=gPT(), per=period();
-  const showPTs=pt?[pt]:PT_LIST;
-  const months=gMonths();
-  function ptVal(field,p){return months.reduce((s,m)=>s+(D[m]?.[p]?.[field]||0),0);}
+  const pt=gPT(), p=per(), mos=gMos(), pts=pt?[pt]:PTS;
+  function ptV(f,p){return mos.reduce((s,m)=>s+a(D[m]?.[p]?.[f]||0),0);}
 
-  const rev=sumField('rev'), ebitda=sumField('ebitda'), net=sumField('net');
+  const rev=sf('rev'), ebitda=sf('ebitda'), net=sf('net');
+  const ep=rev?(ebitda/rev*100).toFixed(1):0;
+  const np=rev?(net/rev*100).toFixed(1):0;
+  const mtmRev=sbM('rev'), mtmEbitda=sbM('ebitda'), mtmNet=sbM('net');
+  const mtmMargin=MOS.map((_,i)=>mtmRev[i]?(mtmEbitda[i]/mtmRev[i]*100):0);
+  const mtmCost=MOS.map(m=>pts.reduce((s,p)=>s+a(D[m]?.[p]?.cogs||0)+a(D[m]?.[p]?.opex||0),0));
 
   const ROWS=[
-    {n:'Revenue',          f:'rev',   total:true},
-    {n:'Cost of Goods Sold',f:'cogs', neg:true},
-    {n:'Gross Profit',     compute:p=>ptVal('rev',p)-ptVal('cogs',p), total:true},
-    {n:'Operating Expenses',f:'opex', neg:true},
-    {n:'EBITDA',           f:'ebitda',total:true,hi:true},
-    {n:'Depreciation & Amortization',f:'depre',neg:true},
-    {n:'EBIT',             compute:p=>ptVal('ebitda',p)-ptVal('depre',p),total:true},
-    {n:'Income Tax (22%)', f:'tax',   neg:true},
-    {n:'Net Profit',       f:'net',   total:true,hi:true},
+    {n:'Revenue',                    f:'rev',   sec:false,tot:false,hi:false},
+    {n:'Cost of Goods Sold',         f:'cogs',  sec:false,tot:false,hi:false},
+    {n:'Gross Profit',               c:p=>ptV('rev',p)-ptV('cogs',p), tot:true,hi:false},
+    {n:'Operating Expenses',         f:'opex',  sec:false,tot:false,hi:false},
+    {n:'EBITDA',                     f:'ebitda',tot:true, hi:true},
+    {n:'Depreciation & Amortization',f:'dep',   sec:false,tot:false,hi:false},
+    {n:'EBIT',                       c:p=>ptV('ebitda',p)-ptV('dep',p), tot:true,hi:false},
+    {n:'Income Tax (22%)',           f:'tax',   sec:false,tot:false,hi:false},
+    {n:'Net Profit',                 f:'net',   tot:true, hi:true},
   ];
 
-  // MtM per selected PT
-  const mtmRev=sumByMonth('rev'), mtmEbitda=sumByMonth('ebitda'), mtmNet=sumByMonth('net');
-
   document.getElementById('content').innerHTML=`
-    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="kpi-card c-blue"><div class="kpi-head"><span class="kpi-lbl">Revenue</span></div><div class="kpi-val">${fmt(rev)}</div><div class="kpi-sub">${per}</div></div>
-      <div class="kpi-card c-purple"><div class="kpi-head"><span class="kpi-lbl">EBITDA</span></div><div class="kpi-val ${ebitda>=0?'pos':'neg'}">${fmt(ebitda)}</div><div class="kpi-pct pos">▲ ${rev?(ebitda/rev*100).toFixed(1):0}%</div></div>
-      <div class="kpi-card ${net>=0?'c-green':'c-red'}"><div class="kpi-head"><span class="kpi-lbl">Net Profit</span></div><div class="kpi-val ${net>=0?'pos':'neg'}">${fmt(net)}</div><div class="kpi-pct ${net>=0?'pos':'neg'}">${net>=0?'▲':'▼'} ${rev?(net/rev*100).toFixed(1):0}%</div></div>
+  <div class="kg" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kc cb"><div class="kh"><span class="kl">Revenue</span></div><div class="kv">${fmt(rev)}</div><div class="ks">${p}</div></div>
+    <div class="kc cp"><div class="kh"><span class="kl">EBITDA</span></div><div class="kv pos">${fmt(ebitda)}</div><div class="kpct pos">▲ ${ep}%</div></div>
+    <div class="kc ${net>=0?'cg':'cr'}"><div class="kh"><span class="kl">Net Profit</span></div><div class="kv ${net>=0?'pos':'neg'}">${fmt(net)}</div><div class="kpct ${net>=0?'pos':'neg'}">${net>=0?'▲':'▼'} ${Math.abs(np)}%</div></div>
+  </div>
+
+  <div class="sec">Revenue, Cost & Margin Trajectory</div>
+  <div class="cg2 full" style="margin-bottom:28px">
+    <div class="cc">
+      <div class="ch"><span class="ct">Revenue vs Cost</span><span style="font-size:10px;color:var(--label)">Bars: Revenue & Cost · Line: EBITDA Margin %</span></div>
+      <div class="cw" style="height:240px"><canvas id="ch-pl-combo"></canvas></div>
     </div>
+  </div>
 
-    <div class="chart-grid" style="margin-bottom:28px">
-      <div class="chart-card" style="grid-column:1/-1">
-        <div class="chart-head"><span class="chart-title">P&L Trend · Month to Month</span><span class="chart-sub">${pt||'Consolidated'}</span></div>
-        <div class="chart-wrap" style="height:240px"><canvas id="ch-pl-mtm"></canvas></div>
-      </div>
+  <div class="sec">P&L Statement Detail · ${p}</div>
+  <div class="tc">
+    <div class="th"><span class="tt">Profit & Loss · ${p}</span><span class="thint">${pt||'Consolidated — All Entities'}</span></div>
+    <div class="ts">
+      <table>
+        <thead><tr><th>Line Item</th><th class="hi">Total (Rp'000)</th><th>% Rev</th>${pts.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
+        <tbody>
+        ${ROWS.map(row=>{
+          const vals=pts.map(p=>row.c?row.c(p):ptV(row.f,p));
+          const total=vals.reduce((s,v)=>s+v,0);
+          const r=sf('rev')||1;
+          const pctR=(a(total)/r*100).toFixed(1)+'%';
+          const trC=row.hi?'rt':row.tot?'rs':'';
+          return`<tr class="${trC}">
+            <td>${row.n}</td>
+            <td class="${row.hi?'hi':''}" style="font-weight:600">${fmt(a(total))}</td>
+            <td style="color:var(--muted)">${pctR}</td>
+            ${vals.map(v=>`<td>${fmt(a(v))}</td>`).join('')}
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
     </div>
+  </div>`;
 
-    <div class="tbl-card">
-      <div class="tbl-bar"><span class="tbl-title">P&L Statement · ${per}</span><span class="tbl-hint">${pt||'Consolidated — All Entities'}</span></div>
-      <div class="tbl-scroll">
-        <table class="dt">
-          <thead><tr><th>Line Item</th><th>Total</th><th>% Rev</th>${showPTs.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
-          <tbody>
-          ${ROWS.map(row=>{
-            const vals=showPTs.map(p=>row.compute?row.compute(p):ptVal(row.f,p));
-            const total=vals.reduce((s,v)=>s+v,0);
-            const r=sumField('rev')||1;
-            const pctR=(Math.abs(total)/r*100).toFixed(1)+'%';
-            const trC=row.hi?'r-total':row.total?'r-section':'';
-            return`<tr class="${trC}">
-              <td>${row.n}</td>
-              <td style="font-weight:600">${fmt(Math.abs(total))}</td>
-              <td style="color:var(--muted)">${pctR}</td>
-              ${vals.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}
-            </tr>`;
-          }).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
-
-  makeLine('ch-pl-mtm',MO,[
-    {label:'Revenue',    data:mtmRev,    borderColor:C[0],backgroundColor:CA(C[0]),fill:false,tension:.35,pointRadius:4,pointBackgroundColor:C[0],borderWidth:2.5},
-    {label:'EBITDA',     data:mtmEbitda, borderColor:C[3],backgroundColor:CA(C[3]),fill:false,tension:.35,pointRadius:4,pointBackgroundColor:C[3],borderWidth:2.5},
-    {label:'Net Profit', data:mtmNet,    borderColor:C[1],backgroundColor:CA(C[1]),fill:false,tension:.35,pointRadius:4,pointBackgroundColor:C[1],borderWidth:2.5},
-  ], true);
+  makeCombo('ch-pl-combo', MO3,
+    [
+      {label:'Revenue', data:mtmRev, backgroundColor:CL(C[0]), borderColor:C[0], borderWidth:1.5, borderRadius:5},
+      {label:'Total Cost', data:mtmCost, backgroundColor:CL(C[7]), borderColor:C[7], borderWidth:1.5, borderRadius:5},
+    ],
+    mtmMargin
+  );
 }
 
 // ── BALANCE SHEET ─────────────────────────────────────────────
 function renderNeraca(){
-  function secRows(items,color){
-    const totals=PT_LIST.map((_,i)=>items.reduce((s,r)=>s+Math.abs(r.v[i]),0));
-    const grand=totals.reduce((s,v)=>s+v,0);
+  function secR(items,col){
+    const tots=PTS.map((_,i)=>items.reduce((s,r)=>s+a(r.v[i]),0));
+    const grd=tots.reduce((s,v)=>s+v,0);
     return items.map(r=>{
-      const t=r.v.reduce((s,v)=>s+Math.abs(v),0);
-      return`<tr><td style="padding-left:24px">${r.name}</td><td style="font-weight:600">${fmt(t)}</td>${r.v.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>`;
-    }).join('')+`<tr class="r-total"><td>Total</td><td>${fmt(grand)}</td>${totals.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>`;
+      const t=r.v.reduce((s,v)=>s+a(v),0);
+      return`<tr><td style="padding-left:22px">${r.n}</td><td class="hi">${fmt(t)}</td>${r.v.map(v=>`<td>${fmt(a(v))}</td>`).join('')}</tr>`;
+    }).join('')+`<tr class="rt"><td>Total</td><td class="hi">${fmt(grd)}</td>${tots.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>`;
   }
   document.getElementById('content').innerHTML=`
-    <div class="tbl-card">
-      <div class="tbl-bar"><span class="tbl-title">Balance Sheet · Latest Period</span><span class="tbl-hint">Consolidated by Entity</span></div>
-      <div class="tbl-scroll">
-        <table class="dt">
-          <thead><tr><th>Account</th><th>Total</th>${PT_LIST.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
-          <tbody>
-            <tr class="r-section"><td colspan="${PT_LIST.length+2}" style="border-left:3px solid var(--blue)">Assets</td></tr>
-            ${secRows(BS.assets,'#2563EB')}
-            <tr class="r-section"><td colspan="${PT_LIST.length+2}" style="border-left:3px solid var(--red)">Liabilities</td></tr>
-            ${secRows(BS.liabilities,'#DC2626')}
-            <tr class="r-section"><td colspan="${PT_LIST.length+2}" style="border-left:3px solid var(--green)">Equity</td></tr>
-            ${secRows(BS.equity,'#059669')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+  <div class="tc">
+    <div class="th"><span class="tt">Balance Sheet · Latest Period</span><span class="thint">Consolidated by Entity</span></div>
+    <div class="ts">
+      <table>
+        <thead><tr><th>Account</th><th class="hi">Total (Rp'000)</th>${PTS.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
+        <tbody>
+          <tr class="rs"><td colspan="${PTS.length+2}" style="border-left:3px solid var(--blue)">Assets</td></tr>
+          ${secR(BS.assets,'blue')}
+          <tr class="rs"><td colspan="${PTS.length+2}" style="border-left:3px solid var(--red)">Liabilities</td></tr>
+          ${secR(BS.liabilities,'red')}
+          <tr class="rs"><td colspan="${PTS.length+2}" style="border-left:3px solid var(--green)">Equity</td></tr>
+          ${secR(BS.equity,'green')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
 }
 
 // ── CASH FLOW ─────────────────────────────────────────────────
 function renderCashflow(){
-  const pt=gPT(), per=period();
-  const cfo=cfSumField('operating'), cfi=cfSumField('investing'), cff=cfSumField('financing');
-  const netCF=cfo+cfi+cff;
-
-  const mtmCFO=cfByMonth('operating'), mtmCFI=cfByMonth('investing'), mtmCFF=cfByMonth('financing');
-  const ptCFO=cfByPT('operating'), ptCFI=cfByPT('investing'), ptCFF=cfByPT('financing');
-  const ptNet=PT_LIST.map((_,i)=>ptCFO[i]+ptCFI[i]+ptCFF[i]);
+  const pt=gPT(), p=per();
+  const cfo=cfSf('op'), cfi=cfSf('inv'), cff=cfSf('fin');
+  const net=cfo+cfi+cff;
+  const mtmOp=cfSbM('op'), mtmInv=cfSbM('inv'), mtmFin=cfSbM('fin');
+  const mtmNet=MOS.map((_,i)=>mtmOp[i]+mtmInv[i]+mtmFin[i]);
+  const mtmNetPct=MOS.map((_,i)=>mtmNet[i]?(mtmNet[i]/mtmOp[i]*100):0);
+  const ptOp=cfSbPT('op'), ptInv=cfSbPT('inv'), ptFin=cfSbPT('fin');
+  const ptNet=PTS.map((_,i)=>ptOp[i]+ptInv[i]+ptFin[i]);
 
   document.getElementById('content').innerHTML=`
-    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="kpi-card ${cfo>=0?'c-green':'c-red'}"><div class="kpi-head"><span class="kpi-lbl">Operating CF</span></div><div class="kpi-val ${cfo>=0?'pos':'neg'}">${fmt(cfo)}</div><div class="kpi-sub">${per}</div></div>
-      <div class="kpi-card ${cfi>=0?'c-green':'c-red'}"><div class="kpi-head"><span class="kpi-lbl">Investing CF</span></div><div class="kpi-val ${cfi>=0?'pos':'neg'}">${fmt(cfi)}</div><div class="kpi-sub">${per}</div></div>
-      <div class="kpi-card ${cff>=0?'c-green':'c-red'}"><div class="kpi-head"><span class="kpi-lbl">Financing CF</span></div><div class="kpi-val ${cff>=0?'pos':'neg'}">${fmt(cff)}</div><div class="kpi-sub">${per}</div></div>
-      <div class="kpi-card ${netCF>=0?'c-blue':'c-red'}"><div class="kpi-head"><span class="kpi-lbl">Net Cash Flow</span></div><div class="kpi-val ${netCF>=0?'pos':'neg'}">${fmt(netCF)}</div><div class="kpi-sub">${per}</div></div>
+  <div class="kg">
+    <div class="kc cg"><div class="kh"><span class="kl">Operating CF</span></div><div class="kv pos">${fmt(cfo)}</div><div class="ks">${p}</div></div>
+    <div class="kc cr"><div class="kh"><span class="kl">Investing CF</span></div><div class="kv">${fmt(cfi)}</div><div class="ks">${p}</div></div>
+    <div class="kc ca"><div class="kh"><span class="kl">Financing CF</span></div><div class="kv">${fmt(cff)}</div><div class="ks">${p}</div></div>
+    <div class="kc cb"><div class="kh"><span class="kl">Net Cash Flow</span></div><div class="kv pos">${fmt(net)}</div><div class="ks">All sources</div></div>
+  </div>
+
+  <div class="sec">Cash Flow Trend · ${pt||'Consolidated'}</div>
+  <div class="cg2 full" style="margin-bottom:28px">
+    <div class="cc">
+      <div class="ch"><span class="ct">Operating vs Investing CF</span><span style="font-size:10px;color:var(--label)">Bars: CF by type · Line: Net CF Efficiency %</span></div>
+      <div class="cw" style="height:240px"><canvas id="ch-cf-combo"></canvas></div>
     </div>
+  </div>
 
-    <div class="chart-grid" style="margin-bottom:28px">
-      <div class="chart-card" style="grid-column:1/-1">
-        <div class="chart-head"><span class="chart-title">Cash Flow Trend · Month to Month</span><span class="chart-sub">${pt||'Consolidated'}</span></div>
-        <div class="chart-wrap" style="height:240px"><canvas id="ch-cf-mtm"></canvas></div>
-      </div>
+  <div class="sec">CF by Entity · ${p}</div>
+  <div class="cg2" style="margin-bottom:28px">
+    <div class="cc">
+      <div class="ch"><span class="ct">Operating CF by Entity</span></div>
+      <div class="cd">${p}</div>
+      <div class="cw" style="height:220px"><canvas id="ch-cf-pt"></canvas></div>
     </div>
-
-    <div class="chart-grid" style="margin-bottom:28px">
-      <div class="chart-card">
-        <div class="chart-head"><span class="chart-title">Operating CF by Entity</span><span class="chart-sub">${per}</span></div>
-        <div class="chart-wrap" style="height:230px"><canvas id="ch-cf-pt"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-head"><span class="chart-title">Net Cash Flow by Entity</span><span class="chart-sub">${per}</span></div>
-        <div class="chart-wrap" style="height:230px"><canvas id="ch-cf-net"></canvas></div>
-      </div>
+    <div class="cc">
+      <div class="ch"><span class="ct">Net Cash Flow by Entity</span></div>
+      <div class="cd">${p}</div>
+      <div class="cw" style="height:220px"><canvas id="ch-cf-net"></canvas></div>
     </div>
+  </div>
 
-    <div class="tbl-card">
-      <div class="tbl-bar"><span class="tbl-title">Cash Flow Detail · ${per}</span></div>
-      <div class="tbl-scroll">
-        <table class="dt">
-          <thead><tr><th>Category</th><th>Total</th>${PT_LIST.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
-          <tbody>
-            <tr class="r-section"><td colspan="${PT_LIST.length+2}">Operating Activities</td></tr>
-            <tr><td style="padding-left:24px">Cash from Operations</td><td style="font-weight:600">${fmt(Math.abs(cfo))}</td>${ptCFO.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
-            <tr class="r-section"><td colspan="${PT_LIST.length+2}">Investing Activities</td></tr>
-            <tr><td style="padding-left:24px">Capital Expenditure & Investments</td><td style="font-weight:600">${fmt(Math.abs(cfi))}</td>${ptCFI.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
-            <tr class="r-section"><td colspan="${PT_LIST.length+2}">Financing Activities</td></tr>
-            <tr><td style="padding-left:24px">Debt & Equity Movements</td><td style="font-weight:600">${fmt(Math.abs(cff))}</td>${ptCFF.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
-            <tr class="r-total"><td>Net Cash Flow</td><td>${fmt(Math.abs(netCF))}</td>${ptNet.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+  <div class="sec">Cash Flow Detail · ${p}</div>
+  <div class="tc">
+    <div class="th"><span class="tt">Cash Flow Statement · ${p}</span></div>
+    <div class="ts">
+      <table>
+        <thead><tr><th>Category</th><th class="hi">Total (Rp'000)</th>${PTS.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
+        <tbody>
+          <tr class="rs"><td colspan="${PTS.length+2}">Operating Activities</td></tr>
+          <tr><td style="padding-left:22px">Cash from Operations</td><td class="hi">${fmt(cfo)}</td>${ptOp.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>
+          <tr class="rs"><td colspan="${PTS.length+2}">Investing Activities</td></tr>
+          <tr><td style="padding-left:22px">Capital Expenditure & Investments</td><td class="hi">${fmt(cfi)}</td>${ptInv.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>
+          <tr class="rs"><td colspan="${PTS.length+2}">Financing Activities</td></tr>
+          <tr><td style="padding-left:22px">Debt & Equity Movements</td><td class="hi">${fmt(cff)}</td>${ptFin.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>
+          <tr class="rt"><td>Net Cash Flow</td><td class="hi">${fmt(net)}</td>${ptNet.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
 
-  makeLine('ch-cf-mtm',MO,[
-    {label:'Operating', data:mtmCFO,borderColor:C[1],backgroundColor:CA(C[1]),fill:true,tension:.3,borderWidth:2.5,pointRadius:4,pointBackgroundColor:C[1]},
-    {label:'Investing', data:mtmCFI,borderColor:C[7],backgroundColor:CA(C[7]),fill:true,tension:.3,borderWidth:2.5,pointRadius:4,pointBackgroundColor:C[7]},
-    {label:'Financing', data:mtmCFF,borderColor:C[3],backgroundColor:CA(C[3]),fill:true,tension:.3,borderWidth:2.5,pointRadius:4,pointBackgroundColor:C[3]},
-  ], true);
-  makeBar('ch-cf-pt',PT_LIST,[
-    {label:'Operating CF',data:ptCFO,backgroundColor:CA(C[1]),borderColor:C[1],borderWidth:2,borderRadius:4},
-    {label:'Investing CF',data:ptCFI,backgroundColor:CA(C[7]),borderColor:C[7],borderWidth:2,borderRadius:4},
-  ],false);
-  const ptNetAbs=ptNet.map(v=>Math.abs(v));
-  charts['ch-cf-net']=new Chart(document.getElementById('ch-cf-net'),{
-    type:'bar',
-    data:{labels:PT_LIST,datasets:[
-      {data:ptNetAbs,backgroundColor:ptNet.map(v=>v>=0?CA(C[1]):CA(C[7])),borderColor:ptNet.map(v=>v>=0?C[1]:C[7]),borderWidth:2,borderRadius:4},
-      {type:'line',label:'',data:ptNetAbs,borderColor:'#2563EB',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#2563EB',fill:false,tension:.35,tooltip:{enabled:false}}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:tickOpts,grid:gridOpts,border:{display:false}},
-        y:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}
-      }
-    }
-  });
+  // CF combo chart
+  makeCombo('ch-cf-combo', MO3,
+    [
+      {label:'Operating CF', data:mtmOp,  backgroundColor:CL(C[1]), borderColor:C[1], borderWidth:1.5, borderRadius:5},
+      {label:'Investing CF', data:mtmInv, backgroundColor:CL(C[2]), borderColor:C[2], borderWidth:1.5, borderRadius:5},
+    ],
+    mtmNetPct
+  );
+
+  // CF by entity
+  makeBar('ch-cf-pt', PTS, [{
+    label:'Operating CF', data:ptOp,
+    backgroundColor:CL(C[1]), borderColor:C[1], borderWidth:1.5, borderRadius:5
+  }], true);
+
+  makeBar('ch-cf-net', PTS, [{
+    label:'Net CF', data:ptNet,
+    backgroundColor:ptNet.map(v=>CL(v>=0?C[1]:C[7])),
+    borderColor:ptNet.map(v=>v>=0?C[1]:C[7]),
+    borderWidth:1.5, borderRadius:5
+  }], true);
 }
 </script>
 </body>
