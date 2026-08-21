@@ -353,9 +353,9 @@ const C=['#3B82F6','#10B981','#F59E0B','#8B5CF6','#EC4899','#06B6D4','#F97316','
 const CD=['#1D4ED8','#047857','#B45309','#6D28D9','#BE185D','#0E7490','#C2410C','#B91C1C','#4338CA'];
 const CL=c=>c+'35';
 
-function fmt(n,d=0){
+function fmt(n,d=1){
   if(n==null||isNaN(n))return'—';
-  const v=Math.abs(n)/1000;
+  const v=Math.abs(n)/1e6;
   const s=n<0?'-':'';
   return s+v.toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d});
 }
@@ -749,7 +749,7 @@ function renderOverview(){
     <div class="th"><span class="tt">Entity Comparison · ${p}</span><span class="thint">Click row to filter</span></div>
     <div class="ts">
       <table>
-        <thead><tr><th>#</th><th>Entity</th><th class="hi">Revenue (Rp'000)</th><th>Share</th><th class="hi">EBITDA (Rp'000)</th><th>EBITDA %</th><th class="hi">Net Profit (Rp'000)</th><th>Net Margin</th></tr></thead>
+        <thead><tr><th>#</th><th>Entity</th><th class="hi">Revenue (Rp jt)</th><th>Share</th><th class="hi">EBITDA (Rp jt)</th><th>EBITDA %</th><th class="hi">Net Profit (Rp jt)</th><th>Net Margin</th></tr></thead>
         <tbody>
         ${ptRevs.map((r,i)=>{
           const ep2=r.rev?(r.ebitda/r.rev*100).toFixed(1):0;
@@ -889,7 +889,7 @@ function renderPL(){
     <div class="th"><span class="tt">Profit & Loss · ${p}</span><span class="thint">${pt||'Consolidated — All Entities'}</span></div>
     <div class="ts">
       <table>
-        <thead><tr><th>Line Item</th><th class="hi">Total (Rp'000)</th><th>% Rev</th>${pts.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
+        <thead><tr><th>Line Item</th><th class="hi">Total (Rp jt)</th><th>% Rev</th>${pts.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
         <tbody>
         ${ROWS.map(row=>{
           const vals=pts.map(p=>row.c?row.c(p):ptV(row.f,p));
@@ -933,7 +933,7 @@ function renderNeraca(){
     <div class="th"><span class="tt">Balance Sheet · Latest Period</span><span class="thint">Consolidated by Entity</span></div>
     <div class="ts">
       <table>
-        <thead><tr><th>Account</th><th class="hi">Total (Rp'000)</th>${PTS.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
+        <thead><tr><th>Account</th><th class="hi">Total (Rp jt)</th>${PTS.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
         <tbody>
           <tr class="rs"><td colspan="${PTS.length+2}" style="border-left:3px solid var(--blue)">Assets</td></tr>
           ${secR(BS.assets,'blue')}
@@ -993,7 +993,7 @@ function renderCashflow(){
     <div class="th"><span class="tt">Cash Flow Statement · ${p}</span></div>
     <div class="ts">
       <table>
-        <thead><tr><th>Category</th><th class="hi">Total (Rp'000)</th>${PTS.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
+        <thead><tr><th>Category</th><th class="hi">Total (Rp jt)</th>${PTS.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
         <tbody>
           <tr class="rs"><td colspan="${PTS.length+2}">Operating Activities</td></tr>
           <tr><td style="padding-left:22px">Cash from Operations</td><td class="hi">${fmt(cfo)}</td>${ptOp.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>
