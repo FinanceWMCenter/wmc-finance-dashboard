@@ -374,12 +374,33 @@ const legOpts={labels:{color:'#64748B',font:{size:10,family:'Inter'},boxWidth:10
 
 function makeBar(id,labels,datasets,stacked=false){
   dc(id);
+  // Add trend line overlay for each dataset
+  const trendDatasets=datasets.flatMap(ds=>{
+    const data=ds.data.map(v=>Math.abs(v));
+    return [
+      {...ds, data},
+      {
+        type:'line', label:'', data,
+        borderColor:ds.borderColor, borderWidth:1.5,
+        pointRadius:3, pointBackgroundColor:ds.borderColor,
+        fill:false, tension:.35, borderDash:[],
+        tooltip:{enabled:false},
+      }
+    ];
+  });
   charts[id]=new Chart(document.getElementById(id),{
-    type:'bar',data:{labels,datasets},
+    type:'bar',
+    data:{labels, datasets:trendDatasets},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:legOpts},
-      scales:{x:{stacked,ticks:tickOpts,grid:gridOpts,border:{display:false}},
-              y:{stacked,ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}}}
+      plugins:{legend:{labels:{
+        color:'#64748B',font:{size:10,family:'Inter'},boxWidth:10,padding:14,
+        filter:item=>item.text!==''
+      }}},
+      scales:{
+        x:{stacked,ticks:tickOpts,grid:gridOpts,border:{display:false}},
+        y:{stacked,ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}
+      }
+    }
   });
 }
 function makeLine(id,labels,datasets,showZero=false){
@@ -412,13 +433,23 @@ function makeLine(id,labels,datasets,showZero=false){
   });
 }
 function makeBarH(id,labels,data,colors){
+  const absData=data.map(v=>Math.abs(v));
   dc(id);
   charts[id]=new Chart(document.getElementById(id),{
-    type:'bar',data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:4}]},
+    type:'bar',
+    data:{labels,datasets:[
+      {data:absData,backgroundColor:colors,borderRadius:4},
+      {type:'line',label:'',data:absData,borderColor:'#2563EB',borderWidth:1.5,
+       pointRadius:3,pointBackgroundColor:'#2563EB',fill:false,tension:.35,
+       tooltip:{enabled:false}}
+    ]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
-      scales:{x:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}},
-              y:{ticks:{...tickOpts,font:{size:10}},grid:{display:false},border:{display:false}}}}
+      scales:{
+        x:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}},
+        y:{ticks:{...tickOpts,font:{size:10}},grid:{display:false},border:{display:false}}
+      }
+    }
   });
 }
 
@@ -507,10 +538,10 @@ function renderOverview(){
             return`<tr style="cursor:pointer" onclick="document.getElementById('f-pt').value='${r.pt}';load()">
               <td style="color:var(--label);font-weight:600">${i+1}</td>
               <td><strong>${r.pt}</strong></td>
-              <td class="${cl(r.rev)}">${fmt(r.rev)}</td>
-              <td class="${cl(r.ebitda)}">${fmt(r.ebitda)}</td>
+              <td>${fmt(Math.abs(r.rev))}</td>
+              <td>${fmt(Math.abs(r.ebitda))}</td>
               <td><span class="kpi-pct ${ep2>=0?'pos':'neg'}" style="margin:0;padding:2px 7px">${ep2}%</span></td>
-              <td class="${cl(r.net)}">${fmt(r.net)}</td>
+              <td>${fmt(Math.abs(r.net))}</td>
               <td><span class="kpi-pct ${np2>=0?'pos':'neg'}" style="margin:0;padding:2px 7px">${np2}%</span></td>
             </tr>`;
           }).join('')}
@@ -599,19 +630,19 @@ function renderPL(){
       <div class="tbl-bar"><span class="tbl-title">P&L Statement · ${per}</span><span class="tbl-hint">${pt||'Consolidated — All Entities'}</span></div>
       <div class="tbl-scroll">
         <table class="dt">
-          <thead><tr><th>Line Item</th>${showPTs.map(p=>`<th>${p}</th>`).join('')}<th>Total</th><th>% Rev</th></tr></thead>
+          <thead><tr><th>Line Item</th><th>Total</th><th>% Rev</th>${showPTs.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
           <tbody>
           ${ROWS.map(row=>{
             const vals=showPTs.map(p=>row.compute?row.compute(p):ptVal(row.f,p));
             const total=vals.reduce((s,v)=>s+v,0);
             const r=sumField('rev')||1;
-            const pctR=(total/r*100).toFixed(1)+'%';
+            const pctR=(Math.abs(total)/r*100).toFixed(1)+'%';
             const trC=row.hi?'r-total':row.total?'r-section':'';
             return`<tr class="${trC}">
               <td>${row.n}</td>
-              ${vals.map(v=>`<td class="${cl(v)}">${fmt(Math.abs(v))}</td>`).join('')}
-              <td class="${cl(total)}">${fmt(Math.abs(total))}</td>
+              <td style="font-weight:600">${fmt(Math.abs(total))}</td>
               <td style="color:var(--muted)">${pctR}</td>
+              ${vals.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}
             </tr>`;
           }).join('')}
           </tbody>
@@ -629,19 +660,19 @@ function renderPL(){
 // ── BALANCE SHEET ─────────────────────────────────────────────
 function renderNeraca(){
   function secRows(items,color){
-    const totals=PT_LIST.map((_,i)=>items.reduce((s,r)=>s+r.v[i],0));
+    const totals=PT_LIST.map((_,i)=>items.reduce((s,r)=>s+Math.abs(r.v[i]),0));
     const grand=totals.reduce((s,v)=>s+v,0);
     return items.map(r=>{
-      const t=r.v.reduce((s,v)=>s+v,0);
-      return`<tr><td style="padding-left:24px">${r.name}</td>${r.v.map(v=>`<td>${fmt(v)}</td>`).join('')}<td style="font-weight:600">${fmt(t)}</td></tr>`;
-    }).join('')+`<tr class="r-total"><td>Total</td>${totals.map(v=>`<td>${fmt(v)}</td>`).join('')}<td>${fmt(grand)}</td></tr>`;
+      const t=r.v.reduce((s,v)=>s+Math.abs(v),0);
+      return`<tr><td style="padding-left:24px">${r.name}</td><td style="font-weight:600">${fmt(t)}</td>${r.v.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>`;
+    }).join('')+`<tr class="r-total"><td>Total</td><td>${fmt(grand)}</td>${totals.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>`;
   }
   document.getElementById('content').innerHTML=`
     <div class="tbl-card">
       <div class="tbl-bar"><span class="tbl-title">Balance Sheet · Latest Period</span><span class="tbl-hint">Consolidated by Entity</span></div>
       <div class="tbl-scroll">
         <table class="dt">
-          <thead><tr><th>Account</th>${PT_LIST.map(p=>`<th>${p}</th>`).join('')}<th>Total</th></tr></thead>
+          <thead><tr><th>Account</th><th>Total</th>${PT_LIST.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
           <tbody>
             <tr class="r-section"><td colspan="${PT_LIST.length+2}" style="border-left:3px solid var(--blue)">Assets</td></tr>
             ${secRows(BS.assets,'#2563EB')}
@@ -695,15 +726,15 @@ function renderCashflow(){
       <div class="tbl-bar"><span class="tbl-title">Cash Flow Detail · ${per}</span></div>
       <div class="tbl-scroll">
         <table class="dt">
-          <thead><tr><th>Category</th>${PT_LIST.map(p=>`<th>${p}</th>`).join('')}<th>Total</th></tr></thead>
+          <thead><tr><th>Category</th><th>Total</th>${PT_LIST.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
           <tbody>
             <tr class="r-section"><td colspan="${PT_LIST.length+2}">Operating Activities</td></tr>
-            <tr><td style="padding-left:24px">Cash from Operations</td>${ptCFO.map(v=>`<td class="${cl(v)}">${fmt(v)}</td>`).join('')}<td class="${cl(cfo)}">${fmt(cfo)}</td></tr>
+            <tr><td style="padding-left:24px">Cash from Operations</td><td style="font-weight:600">${fmt(Math.abs(cfo))}</td>${ptCFO.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
             <tr class="r-section"><td colspan="${PT_LIST.length+2}">Investing Activities</td></tr>
-            <tr><td style="padding-left:24px">Capital Expenditure & Investments</td>${ptCFI.map(v=>`<td class="${cl(v)}">${fmt(v)}</td>`).join('')}<td class="${cl(cfi)}">${fmt(cfi)}</td></tr>
+            <tr><td style="padding-left:24px">Capital Expenditure & Investments</td><td style="font-weight:600">${fmt(Math.abs(cfi))}</td>${ptCFI.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
             <tr class="r-section"><td colspan="${PT_LIST.length+2}">Financing Activities</td></tr>
-            <tr><td style="padding-left:24px">Debt & Equity Movements</td>${ptCFF.map(v=>`<td class="${cl(v)}">${fmt(v)}</td>`).join('')}<td class="${cl(cff)}">${fmt(cff)}</td></tr>
-            <tr class="r-total"><td>Net Cash Flow</td>${ptNet.map(v=>`<td class="${cl(v)}">${fmt(v)}</td>`).join('')}<td class="${cl(netCF)}">${fmt(netCF)}</td></tr>
+            <tr><td style="padding-left:24px">Debt & Equity Movements</td><td style="font-weight:600">${fmt(Math.abs(cff))}</td>${ptCFF.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
+            <tr class="r-total"><td>Net Cash Flow</td><td>${fmt(Math.abs(netCF))}</td>${ptNet.map(v=>`<td>${fmt(Math.abs(v))}</td>`).join('')}</tr>
           </tbody>
         </table>
       </div>
@@ -718,12 +749,20 @@ function renderCashflow(){
     {label:'Operating CF',data:ptCFO,backgroundColor:CA(C[1]),borderColor:C[1],borderWidth:2,borderRadius:4},
     {label:'Investing CF',data:ptCFI,backgroundColor:CA(C[7]),borderColor:C[7],borderWidth:2,borderRadius:4},
   ],false);
+  const ptNetAbs=ptNet.map(v=>Math.abs(v));
   charts['ch-cf-net']=new Chart(document.getElementById('ch-cf-net'),{
     type:'bar',
-    data:{labels:PT_LIST,datasets:[{data:ptNet,backgroundColor:ptNet.map(v=>v>=0?CA(C[1]):CA(C[7])),borderColor:ptNet.map(v=>v>=0?C[1]:C[7]),borderWidth:2,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:tickOpts,grid:gridOpts,border:{display:false}},
-              y:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}}}
+    data:{labels:PT_LIST,datasets:[
+      {data:ptNetAbs,backgroundColor:ptNet.map(v=>v>=0?CA(C[1]):CA(C[7])),borderColor:ptNet.map(v=>v>=0?C[1]:C[7]),borderWidth:2,borderRadius:4},
+      {type:'line',label:'',data:ptNetAbs,borderColor:'#2563EB',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#2563EB',fill:false,tension:.35,tooltip:{enabled:false}}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:tickOpts,grid:gridOpts,border:{display:false}},
+        y:{ticks:{...tickOpts,callback:v=>fmt(v,0)},grid:gridOpts,border:{display:false}}
+      }
+    }
   });
 }
 </script>
